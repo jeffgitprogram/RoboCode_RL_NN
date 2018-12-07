@@ -44,65 +44,113 @@ public class rx75GunTank extends AdvancedRobot{
 		setAdjustRadarForGunTurn(true);
 		execute();
 		
-		while(true) {
-			turnRadarRightRadians(2*PI);
-			//Get Last State
-			state = getState();
-			action = agent.selectAction(state);
-			
-			switch(action) {
-			case Actions.RobotAhead:
-				setAhead(Actions.RobotMoveDistance);
-				break;
-			case Actions.RobotBack:
-				setBack(Actions.RobotMoveDistance);
-				break;
-			case Actions.RobotAheadTurnLeft:
-				setAhead(Actions.RobotMoveDistance);
-				setTurnLeft(Actions.RobotTurnDegree);
-				break;
-			case Actions.RobotAheadTurnRight:
-				setAhead(Actions.RobotMoveDistance);
-				setTurnRight(Actions.RobotTurnDegree);
-				break;
-			case Actions.RobotBackTurnLeft:
-				setBack(Actions.RobotMoveDistance);
-				setTurnLeft(Actions.RobotTurnDegree);
-				break;
-			case Actions.RobotBackTurnRight:
-				setBack(Actions.RobotMoveDistance);
-				setTurnRight(Actions.RobotTurnDegree);
-				break;
-			case Actions.RobotFire:
-				ahead(0);
-				turnLeft(0);
-				scanAndFire();
-				break;
-			default:
-				System.out.println("Action Not Found");
-				break;
-			
-			}
-			
-			execute();
-			
-			turnRadarRightRadians(2*PI);
-			//Update states
-			state = getState();
+		
 			if(isSARSA) {
-				agent.SARSLearn(state, action, reward);
+				//Get Last State
+					state = getState();
+					turnRadarRightRadians(2*PI);
+					action = agent.selectAction(state);
+				while(true) {									
+					switch(action) {
+					case Actions.RobotAhead:
+						setAhead(Actions.RobotMoveDistance);
+						break;
+					case Actions.RobotBack:
+						setBack(Actions.RobotMoveDistance);
+						break;
+					case Actions.RobotAheadTurnLeft:
+						setAhead(Actions.RobotMoveDistance);
+						setTurnLeft(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotAheadTurnRight:
+						setAhead(Actions.RobotMoveDistance);
+						setTurnRight(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotBackTurnLeft:
+						setBack(Actions.RobotMoveDistance);
+						setTurnLeft(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotBackTurnRight:
+						setBack(Actions.RobotMoveDistance);
+						setTurnRight(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotFire:
+						ahead(0);
+						turnLeft(0);
+						scanAndFire();
+						break;
+					default:
+						System.out.println("Action Not Found");
+						break;					
+					}					
+					execute();					
+					turnRadarRightRadians(2*PI);
+					//Update states
+					state = getState();
+					action = agent.selectAction(state);
+					agent.SARSLearn(state, action, reward);
+					accumuReward += reward;
+				
+					//Reset Values
+					reward = 0.0d;
+					isHitWall = 0;
+					isHitByBullet = 0;
+				}
 			}
 			else {
-				agent.QLearn(state, action, reward);
+				state = getState();//Get Last State
+				while(true) {
+					turnRadarRightRadians(2*PI);			
+					
+					action = agent.selectAction(state);					
+					switch(action) {
+					case Actions.RobotAhead:
+						setAhead(Actions.RobotMoveDistance);
+						break;
+					case Actions.RobotBack:
+						setBack(Actions.RobotMoveDistance);
+						break;
+					case Actions.RobotAheadTurnLeft:
+						setAhead(Actions.RobotMoveDistance);
+						setTurnLeft(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotAheadTurnRight:
+						setAhead(Actions.RobotMoveDistance);
+						setTurnRight(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotBackTurnLeft:
+						setBack(Actions.RobotMoveDistance);
+						setTurnLeft(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotBackTurnRight:
+						setBack(Actions.RobotMoveDistance);
+						setTurnRight(Actions.RobotTurnDegree);
+						break;
+					case Actions.RobotFire:
+						ahead(0);
+						turnLeft(0);
+						scanAndFire();
+						break;
+					default:
+						System.out.println("Action Not Found");
+						break;
+					
+					}
+					
+					execute();					
+					turnRadarRightRadians(2*PI);
+					//Update states
+					state = getState();
+					agent.QLearn(state, action, reward);
+					accumuReward += reward;					
+					//Reset Values
+					reward = 0.0d;
+					isHitWall = 0;
+					isHitByBullet = 0;
+				}
 			}
 			
-			accumuReward += reward;
-			
-			//Reset Values
-			reward = 0.0d;
-			isHitWall = 0;
-			isHitByBullet = 0;
-		}
+
 		
 	}
 	
