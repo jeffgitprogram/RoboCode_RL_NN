@@ -33,7 +33,7 @@ public interface CommonInterface {
 	* A method to write either a LUT or weights of an neural net to a file.
 	* @param argFile of type File.
 	*/
-	public void saveData(File argFile);
+	public void save(File argFile);
 	/**
 	* Loads the LUT or neural net weights from file. The load must of course
 	* have knowledge of how the data was written out by the save method.
@@ -42,7 +42,7 @@ public interface CommonInterface {
 	* the data in the file. (e.g. wrong number of hidden neurons).
 	* @throws IOException
 	*/
-	public void loadData(File file) throws IOException;
+	public void load(File file) throws IOException;
 
 }
 

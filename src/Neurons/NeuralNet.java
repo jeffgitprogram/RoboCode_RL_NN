@@ -262,13 +262,13 @@ public class NeuralNet implements NeuralNetInterface {
 	
 
 	@Override
-	public void saveData(File argFile) {
+	public void save(File argFile) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void loadData(File argFileName) throws IOException {
+	public void load(File argFileName) throws IOException {
 		// TODO Auto-generated method stub
 
 	}
