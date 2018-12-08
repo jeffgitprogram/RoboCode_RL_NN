@@ -18,7 +18,7 @@
 		<link>
 			<name>robots</name>
 			<type>2</type>
-			<location>D:/robocode/robots</location>
+			<location>C:/robocode/robots</location>
 		</link>
 	</linkedResources>
 </projectDescription>
