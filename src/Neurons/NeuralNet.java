@@ -17,8 +17,8 @@ public class NeuralNet implements NeuralNetInterface {
 	private int argNumOutputs;
 	private double argLearningRate;
 	private double argMomentumRate;
-	private double argA;
-	private double argB;
+	private double argQMin;
+	private double argQMax;
 	/*Keep inputNeuron, hiddenNeuron, outputNeuron separately in arraylists*/
 	private ArrayList<Neuron> inputLayerNeurons = new ArrayList<Neuron>();	
 	private ArrayList<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
@@ -27,9 +27,9 @@ public class NeuralNet implements NeuralNetInterface {
 	/* Need to keep in mind that, all neurons can connect to the same bias neuron, since the output of bias neuron is not evaluated*/
 	private Neuron biasNeuron = new Neuron("bias"); // Neuron id 0 is reserved for bias neuron
 	/**These arrays and list save the input data, expected output, actual output and error in each epoch****/
-	private double inputData[][] = {{0,0},{1,0},{0,1},{1,1}};	
-	private double expectedOutput[][] = {{0},{1},{1},{0}};
-	private double epochOutput[][] = {{-1},{-1}, {-1}, {-1}};//Initial value -1 for each output
+	private double inputData[][];	
+	private double expectedOutput[][];
+	private double epochOutput[][];//Initial value -1 for each output
 	private ArrayList<Double> errorInEachEpoch = new ArrayList<>();
 	
 	
@@ -45,8 +45,8 @@ public class NeuralNet implements NeuralNetInterface {
 		this.argNumOutputs = numOutputs;
 		this.argLearningRate = learningRate;
 		this.argMomentumRate = momentumRate;
-		this.argA = a;
-		this.argB = b;
+		this.argQMin = a;
+		this.argQMax = b;
 		this.inputData = inputData;
 		this.expectedOutput = expectedOutput;
 		this.setUpNetwork();
@@ -114,11 +114,11 @@ public class NeuralNet implements NeuralNetInterface {
 	 */
 	public void forwardPropagation() {
 		for(Neuron hidden: hiddenLayerNeurons) {
-			hidden.calculateOutput(argA,argB);
+			hidden.calculateOutput(argQMin,argQMax);
 		}
 		
 		for (Neuron output: outputLayerNeurons) {
-			output.calculateOutput(argA, argB);
+			output.calculateOutput(argQMin, argQMax);
 		}
 	}
 	
@@ -209,7 +209,7 @@ public class NeuralNet implements NeuralNetInterface {
 	 * This method performs one epoch of train to the NN.
 	 * @return accumulate squared error generated in one epoch.
 	 */
-	public double train() {
+	public double train(double [] argInputVector, double argTargetOutput) {
 		double totalError = 0.0;
 		for(int p = 0; p < inputData.length; p++) {
 			double error = 0.0;
@@ -226,23 +226,7 @@ public class NeuralNet implements NeuralNetInterface {
 		return 0.5*totalError;
 	}
 	
-	/**
-	 * This method run train for many epochs till the NN converge subjects to the max step constrain.	
-	 * @param maxStep
-	 * @param minError
-	 */
-	public void tryConverge(int maxStep, double minError) {
-		int i;
-		double error = 1;
-		for(i = 0; i < maxStep && error > minError; i++) {
-			error = train();
-		}
-		System.out.println("Sum of squared error in last epoch = " + error);
-		System.out.println("Number of epoch: "+ i + "\n");
-		if(i == maxStep) {
-			System.out.println("Error in training, try again!");
-		}
-	}
+	
 	/**
 	 * This method print epoch errors into a .csv file.
 	 * @param errors
@@ -288,7 +272,7 @@ public class NeuralNet implements NeuralNetInterface {
      * @return f'(x) = -(1 / (b - a))(customSigmoid - a)(customSigmoid - b)
      */	
 	public double customSigmoidDerivative(double yi) {
-		double result = -(1.0/(argB-argA)) * (yi-argA) * (yi-argB);
+		double result = -(1.0/(argQMax-argQMin)) * (yi-argQMin) * (yi-argQMax);
 		return result;
 	}
 

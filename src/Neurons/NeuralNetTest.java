@@ -1,5 +1,5 @@
 package Neurons;
-
+import Neurons.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -202,7 +202,7 @@ public class NeuralNetTest {
 		success = 0;
 		for(int i = 0; i < numTrials; i++) {
 			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound,input,expected); //Construct a new neural net object
-			testNeuronNet.tryConverge(maxSteps, minError);//Train the network with step and error constrains
+			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
 			epochNumber = testNeuronNet.getErrorArray().size(); //get the epoch number of this trial.
 			if( epochNumber < maxSteps) {
 				average = average +  testNeuronNet.getErrorArray().size();
@@ -217,5 +217,26 @@ public class NeuralNetTest {
 		average = average/success;
 		return (int)average;		
 	}	
+	/**
+	 * This method run train for many epochs till the NN converge subjects to the max step constrain.	
+	 * @param maxStep
+	 * @param minError
+	 */
+	public void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
+		int i;
+		double error = 1;
+		for(i = 0; i < maxStep && error > minError; i++) {
+			error = 0;
+			for(int p = 0; p < input.length; p++) {
+				
+				error += theNet.train();
+			}
+		}
+		System.out.println("Sum of squared error in last epoch = " + error);
+		System.out.println("Number of epoch: "+ i + "\n");
+		if(i == maxStep) {
+			System.out.println("Error in training, try again!");
+		}
+	}
 
 }

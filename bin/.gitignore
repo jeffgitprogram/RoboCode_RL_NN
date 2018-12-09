@@ -1,10 +1,8 @@
-/META-INF/
-/Neurons/
 /bots/
-/interfaces/
-/learning/
-/robot.database
+/META-INF/
 /sample/
 /sampleex/
 /samplesentry/
 /sampleteam/
+/Neurons/
+/interfaces/
