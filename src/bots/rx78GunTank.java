@@ -359,7 +359,8 @@ public class rx78GunTank extends AdvancedRobot{
 	     
 	public void saveData()   {   
 	      try   {   
-	        lut.saveData(getDataFile("LUT.dat"));   
+	        lut.saveData(getDataFile("LUT.dat"));
+	        lut.printTable(getDataFile("LUT_2.dat"));
 	      }   
 	      catch (Exception e)   {   
 	        out.println("Exception trying to write: " + e);   

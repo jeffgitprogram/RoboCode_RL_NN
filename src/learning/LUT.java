@@ -47,13 +47,19 @@ public class LUT {
 		return bestAction;
 	}
 	
+	public double [] [] getTable(){
+		return table;
+	}
+	
 	public void loadData(File file)   {   
 		BufferedReader read = null;   
 	    try   {   
 	    	read = new BufferedReader(new FileReader(file));   
 	    	for (int i = 0; i < States.NumStates; i++)   
-	    		for (int j = 0; j < Actions.NumRobotActions; j++)   
-	    			table[i][j] = Double.parseDouble(read.readLine());   
+	    		for (int j = 0; j < Actions.NumRobotActions; j++){ 
+	    			//double temp = Double.parseDouble(read.readLine());
+	    			table[i][j] = Double.parseDouble(read.readLine());  
+	    		}
 	    }   
 	    catch (IOException e)   {   
 	    	System.out.println("IOException trying to open reader: " + e);   
@@ -101,17 +107,34 @@ public class LUT {
 	  }
 	
 	
-	public void printTable(String fileName) throws IOException {
-		System.out.println("good up till here");
-		PrintWriter printWriter = new PrintWriter(new FileWriter(fileName));		
-		printWriter.printf("State, Action, QValue \n");
-		for (int i = 0; i < States.NumStates; i++)   {
-	        for (int j = 0; j < Actions.NumRobotActions; j++) {
-	        	printWriter.printf("%d, %d, %f, \n", i, j, this.table[i][j]);
-	        }
+	public void printTable(File fileName) throws IOException {
+		PrintStream printWriter = null;
+		try{
+			printWriter= new PrintStream(new RobocodeFileOutputStream(fileName));		
+			printWriter.println("State"+" \t"+"Action"+" \t"+"QValue");
+			for (int i = 0; i < States.NumStates; i++)   {
+		        for (int j = 0; j < Actions.NumRobotActions; j++) {
+		        	printWriter.println( i+" \t"+ j+" \t"+ this.table[i][j]);
+		        }
+			}
+			if (printWriter.checkError())   
+					System.out.println("Could not save the data!");   
+			printWriter.flush();
+			printWriter.close();
 		}
-		printWriter.flush();
-		printWriter.close();
+		catch(IOException e){
+			System.out.println("IOException trying to write: " + e); 
+		}
+		finally   {   
+	    	try   {   
+	    		if (printWriter != null)   
+	    			printWriter.close();   
+	    	}   
+	    	catch (Exception e)   {   
+	    		System.out.println("Exception trying to close witer: " + e);   
+	    	}   
+	    }
+		
 	}
 
 

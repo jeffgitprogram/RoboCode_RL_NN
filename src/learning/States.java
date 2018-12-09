@@ -52,4 +52,26 @@ public class States {
 	public static int getStateIndex(int heading, int distance, int bearing, int hitwall, int hitbybullet) {
 		return Mapping[heading][distance][bearing][hitwall][hitbybullet];
 	}
+	
+	public static int[] getStateFromIndex(int index)
+	 {
+		 int heading = index/(NumTargetDistance*NumTargetBearing*NumHitWall*NumHitByBullet);
+		 int remain = index % (NumTargetDistance*NumTargetBearing*NumHitWall*NumHitByBullet);
+		 int targetDistances = remain/(NumTargetBearing*NumHitWall*NumHitByBullet);
+		 remain = remain % (NumTargetBearing*NumHitWall*NumHitByBullet);
+		 int targetBearing = remain/(NumHitWall*NumHitByBullet);
+		 remain = remain % (NumHitWall*NumHitByBullet);
+		 int hitWall = remain/(NumHitByBullet);
+		 remain = remain % (NumHitByBullet);
+		 int hitByBullet = remain ;
+				 
+		 int[] states = new int[5];		 
+		 states[0]=heading;
+		 states[1]=targetDistances;
+		 states[2]=targetBearing;
+		 states[3]=hitWall;
+		 states[4]=hitByBullet;
+		 
+		 return states;
+	 }
 }

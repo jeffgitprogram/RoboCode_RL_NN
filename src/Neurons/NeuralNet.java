@@ -1,11 +1,10 @@
 package Neurons;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.util.Random;
 
 import interfaces.NeuralNetInterface;
@@ -234,14 +233,76 @@ public class NeuralNet implements NeuralNetInterface {
 
 	@Override
 	public void save(File argFile) {
-		// TODO Auto-generated method stub
+		PrintStream savefile = null;
+		try{
+			savefile = new PrintStream(new FileOutputStream(argFile) );
+			savefile.println(outputLayerNeurons.size());
+			savefile.println(hiddenLayerNeurons.size());
+			savefile.println(inputLayerNeurons.size());
+			for(Neuron output : outputLayerNeurons){
+				ArrayList<NeuronConnection> connections = output.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					savefile.println(link.getWeight());
+				}
+			}
+			for(Neuron hidden: hiddenLayerNeurons) {
+				ArrayList<NeuronConnection> connections = hidden.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					savefile.println(link.getWeight());
+				}
+			}
+			savefile.flush();
+			savefile.close();				
+		}
+		catch(IOException e){
+			System.out.println("Cannot save the weight table.");
+		}
 
 	}
 
 	@Override
 	public void load(File argFileName) throws IOException {
-		// TODO Auto-generated method stub
+		
+		try{
+			BufferedReader readfile = new BufferedReader(new FileReader(argFileName));
+			int numOutputNeuron = Integer.valueOf(readfile.readLine());
+			int numHiddenNeuron = Integer.valueOf(readfile.readLine());
+			int numInputNeuron = Integer.valueOf(readfile.readLine());
+			if ( numInputNeuron != inputLayerNeurons.size() ) {
+				System.out.println ( "*** Number of inputs in file does not match expectation");
+				readfile.close();
+				throw new IOException();
+			}
+			if ( numHiddenNeuron != hiddenLayerNeurons.size() ) {
+				System.out.println ( "*** Number of hidden in file does not match expectation" );
+				readfile.close();
+				throw new IOException();
+			}
+			if ( numOutputNeuron != outputLayerNeurons.size() ) {
+				System.out.println ( "*** Number of output in file does not match expectation" );
+				readfile.close();
+				throw new IOException();
+			}			
 
+			for(Neuron output : outputLayerNeurons){
+				ArrayList<NeuronConnection> connections = output.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					link.setWeight(Double.valueOf(readfile.readLine()));
+				}
+			}
+			for(Neuron hidden: hiddenLayerNeurons) {
+				ArrayList<NeuronConnection> connections = hidden.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					link.setWeight(Double.valueOf(readfile.readLine()));
+				}
+			}
+			
+			readfile.close();
+		}
+		catch(IOException e){
+			System.out.println("IOException failed to open reader: " + e);
+		}
+		
 	}
 	
 	public double sigmoidDerivative(double yi) {
