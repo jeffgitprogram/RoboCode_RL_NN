@@ -4,20 +4,23 @@ public class States {
 	public static final int NumHeading = 4;  //Four states, up, right, down, left
 	public static final int NumTargetDistance = 10;  //Ten levels of distance
 	public static final int NumTargetBearing = 4;  
-	public static final int NumHitWall = 2;  
+	//public static final int NumHitWall = 2;  
+	public static final int NumHorizontalPositionUnsafe = 2; 
+	public static final int NumVerticalPositionUnsafe = 2; 
 	public static final int NumHitByBullet = 2;  
 	public static final int NumStates;  
-	private static final int Mapping[][][][][];
+	public static final int Mapping[][][][][][];
 	
 	static  {  
-		Mapping = new int[NumHeading][NumTargetDistance][NumTargetBearing][NumHitWall][NumHitByBullet];  
+		Mapping = new int[NumHeading][NumTargetDistance][NumTargetBearing][NumHorizontalPositionUnsafe][NumVerticalPositionUnsafe][NumHitByBullet];  
 		int count = 0;  
 		for (int a = 0; a < NumHeading; a++)  
 		  for (int b = 0; b < NumTargetDistance; b++)  
 		    for (int c = 0; c < NumTargetBearing; c++)  
-		      for (int d = 0; d < NumHitWall; d++)  
-		        for (int e = 0; e < NumHitByBullet; e++)  
-		      Mapping[a][b][c][d][e] = count++;  
+		      for (int d = 0; d < NumHorizontalPositionUnsafe; d++)  
+		    	for (int e = 0; e < NumVerticalPositionUnsafe; e++)  
+		          for (int f = 0; f < NumHitByBullet; f++)  
+		      Mapping[a][b][c][d][e][f] = count++;  
 		  
 		NumStates = count;  
 	}
@@ -48,29 +51,50 @@ public class States {
 		return (int)(newBearing / unit);  
 	} 
 	
+	public static int getHorizontalPositionUnsafe (double robotX, double BattleFieldX)  {
+		int distanceToCenterH;
+		if (robotX > 50 || robotX < BattleFieldX-50 ) {
+			distanceToCenterH = 0;	// Safe
+		} else {
+			distanceToCenterH = 1;	// unSafe, too close to wall
+		}
+		return distanceToCenterH;
+	}
 	
-	public static int getStateIndex(int heading, int distance, int bearing, int hitwall, int hitbybullet) {
-		return Mapping[heading][distance][bearing][hitwall][hitbybullet];
+	public static int getVerticalPositionUnsafe (double robotY, double BattleFieldY)  {
+		int distanceToCenterV;
+		if (robotY > 50 || robotY < BattleFieldY-50 ) {
+			distanceToCenterV = 0;	// Safe
+		} else {
+			distanceToCenterV = 1;	// unSafe, too close to wall
+		}
+		return distanceToCenterV;
+	}
+	
+	
+	public static int getStateIndex(int heading, int distance, int bearing, int horizontalUnsafe,int verticalUnsafe, int hitbybullet) {
+		return Mapping[heading][distance][bearing][horizontalUnsafe][verticalUnsafe][hitbybullet];
 	}
 	
 	public static int[] getStateFromIndex(int index)
 	 {
-		 int heading = index/(NumTargetDistance*NumTargetBearing*NumHitWall*NumHitByBullet);
-		 int remain = index % (NumTargetDistance*NumTargetBearing*NumHitWall*NumHitByBullet);
-		 int targetDistances = remain/(NumTargetBearing*NumHitWall*NumHitByBullet);
-		 remain = remain % (NumTargetBearing*NumHitWall*NumHitByBullet);
-		 int targetBearing = remain/(NumHitWall*NumHitByBullet);
-		 remain = remain % (NumHitWall*NumHitByBullet);
-		 int hitWall = remain/(NumHitByBullet);
-		 remain = remain % (NumHitByBullet);
-		 int hitByBullet = remain ;
-				 
-		 int[] states = new int[5];		 
+		 int heading = index/(NumTargetDistance*NumTargetBearing*NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 int remain = index % (NumTargetDistance*NumTargetBearing*NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 int targetDistances = remain/(NumTargetBearing*NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 remain = remain % (NumTargetBearing*NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 int targetBearing = remain/(NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 remain = remain % (NumHorizontalPositionUnsafe*NumVerticalPositionUnsafe*NumHitByBullet);
+		 int horizontalUnsafe = remain/(NumVerticalPositionUnsafe*NumHitByBullet);
+		 remain = remain % (NumVerticalPositionUnsafe*NumHitByBullet);
+		 int verticalUnsafe = remain/(NumHitByBullet);
+		 int hitByBullet = remain % (NumHitByBullet);		 
+		 int[] states = new int[6];		 
 		 states[0]=heading;
 		 states[1]=targetDistances;
 		 states[2]=targetBearing;
-		 states[3]=hitWall;
-		 states[4]=hitByBullet;
+		 states[3]=horizontalUnsafe;
+		 states[4]=verticalUnsafe;
+		 states[5]=hitByBullet;
 		 
 		 return states;
 	 }

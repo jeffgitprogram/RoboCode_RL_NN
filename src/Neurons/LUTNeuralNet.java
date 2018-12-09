@@ -14,17 +14,13 @@ public class LUTNeuralNet {
 	private int numInput = States.NumStates;
 	private int numHidden = 4;
 	private int numOutput = 1;
-	private static double inputData[][];	
-	private double expectedOutput[][] = {{0},{1},{1},{0}};
+	private static double inputData[];	
+	private static double expectedOutput[][];
 	private double learningRate = 0.2;
 	private double momentumRate_1 = 0.0;
 	private double u_lowerBound = 0.0;
 	private double u_upperBound = 1.0;
-	private double b_inputData[][] = {{-1,-1},{1,-1},{-1,1},{1,1}};	
-	private double b_expectedOutput[][] = {{-1},{1},{1},{-1}};
-	private double momentumRate_2 = 0.9;
-	private double b_lowerBound = -1.0;
-	private double b_upperBound = 1.0;
+
 	
 	private ArrayList<Double> errorInEachEpoch;
 	
@@ -34,10 +30,43 @@ public class LUTNeuralNet {
 		LUT lut = new LUT();
 		File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		lut.loadData(file);
-		inputData = lut.getTable();
+		expectedOutput = lut.getTable();
+		//int index = States.getStateIndex(2, 5, 3,1,1, 0);
+		//int [] states = States.getStateFromIndex(index);
+		/*for(int act = 0; act < Actions.NumRobotActions; act++) {
+			for(int state = 0; state < States.NumStates; state++) {
+				int states1[] = States.getStateFromIndex(state);
+				
+			}
+		}*/
+		
 	}
 	
-	
+	public double [] normalizeInputData(int [] states) {
+		double [] normalizedStates = new double [5];
+		for(int i = 0; i < States.NumStates; i++) {
+			switch (i) {
+			case 0:
+				normalizedStates[0] = -1.0 + ((double)states[0])*2.0/3.0;
+				break;
+			case 1:
+				normalizedStates[1] = -1.0 + ((double)states[1])*2.0/9.0;
+				break;
+			case 2:
+				normalizedStates[2] = -1.0 + ((double)states[2])*2.0/3.0;
+				break;
+			case 3:
+				normalizedStates[3] = -1.0 + ((double)states[3])*2.0;
+				break;
+			case 4:
+				normalizedStates[4] = -1.0 + ((double)states[4])*2.0;
+				break;
+			default:
+				System.out.println("The data doesn't belong here.");
+			}
+		}
+		return normalizedStates;
+	}
 	
 	
 	/***

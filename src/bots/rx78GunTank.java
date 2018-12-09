@@ -170,7 +170,10 @@ public class rx78GunTank extends AdvancedRobot{
 		int heading = States.getHeading(getHeading()); //get heading in degrees
 		int targetDistance = States.getTargetDistance(target.getDistance());
 		int targetBearing = States.getTargetBearing(target.getBearing());
-		int state = States.getStateIndex(heading, targetDistance, targetBearing, isHitWall, isHitByBullet);
+		int horizontalUnsafe = States.getHorizontalPositionUnsafe(getX(),getBattleFieldWidth());
+		int verticalUnsafe = States.getVerticalPositionUnsafe(getY(), getBattleFieldHeight());
+		//int state = States.getStateIndex(heading, targetDistance, targetBearing, isHitWall, isHitByBullet);
+		int state = States.getStateIndex(heading, targetDistance, targetBearing, horizontalUnsafe,verticalUnsafe, isHitByBullet);
 		return state;
 		
 	}
