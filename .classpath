@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="D:/robocode/libs/robocode.jar" sourcepath="">
 		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/robocode/javadoc/"/>
+			<attribute name="javadoc_location" value="file:/D:/robocode/javadoc/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
