@@ -53,7 +53,7 @@ public class States {
 	
 	public static int getHorizontalPositionUnsafe (double robotX, double BattleFieldX)  {
 		int distanceToCenterH;
-		if (robotX > 50 || robotX < BattleFieldX-50 ) {
+		if (robotX > 50 && robotX < BattleFieldX-50 ) {
 			distanceToCenterH = 0;	// Safe
 		} else {
 			distanceToCenterH = 1;	// unSafe, too close to wall
@@ -63,7 +63,7 @@ public class States {
 	
 	public static int getVerticalPositionUnsafe (double robotY, double BattleFieldY)  {
 		int distanceToCenterV;
-		if (robotY > 50 || robotY < BattleFieldY-50 ) {
+		if (robotY > 50 && robotY < BattleFieldY-50 ) {
 			distanceToCenterV = 0;	// Safe
 		} else {
 			distanceToCenterV = 1;	// unSafe, too close to wall

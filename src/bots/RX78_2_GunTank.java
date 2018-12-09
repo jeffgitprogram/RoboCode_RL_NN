@@ -10,7 +10,7 @@ import learning.*;
 //API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
 
-public class rx78GunTank extends AdvancedRobot{
+public class RX78_2_GunTank extends AdvancedRobot{
 	
 	public static final double PI = Math.PI;
 	private Target target;
@@ -30,7 +30,7 @@ public class rx78GunTank extends AdvancedRobot{
 	private double accumuReward = 0.0;
 	
 	private boolean interRewards = true;
-	private boolean isSARSA = true; //Switch between on policy and off policy, true = on-policy, false = off-policy
+	private boolean isSARSA = false; //Switch between on policy and off policy, true = on-policy, false = off-policy
 	//private PrintStream w = null;
 	public void run() {
 		lut = new LUT();
@@ -363,7 +363,6 @@ public class rx78GunTank extends AdvancedRobot{
 	public void saveData()   {   
 	      try   {   
 	        lut.saveData(getDataFile("LUT.dat"));
-	        lut.printTable(getDataFile("LUT_2.dat"));
 	      }   
 	      catch (Exception e)   {   
 	        out.println("Exception trying to write: " + e);   
