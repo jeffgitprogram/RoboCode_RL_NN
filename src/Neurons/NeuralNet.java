@@ -27,18 +27,16 @@ public class NeuralNet implements NeuralNetInterface {
 	/* Need to keep in mind that, all neurons can connect to the same bias neuron, since the output of bias neuron is not evaluated*/
 	private Neuron biasNeuron = new Neuron("bias"); // Neuron id 0 is reserved for bias neuron
 	/**These arrays and list save the input data, expected output, actual output and error in each epoch****/
-	private double inputData[][];	
-	private double expectedOutput[][];
-	private double epochOutput[][];//Initial value -1 for each output
-	private ArrayList<Double> errorInEachEpoch = new ArrayList<>();
+	//private double inputData[][];	
+	//private double expectedOutput[][];
+	//private double epochOutput[][];//Initial value -1 for each output
+	//private ArrayList<Double> errorInEachEpoch = new ArrayList<>();
 	
 	
 	public NeuralNet(
 					int numInputs, int numHiddens, 
 					int numOutputs, double learningRate, 
-					double momentumRate, double a, double b,
-					double [][] inputData,
-					double [][] expectedOutput
+					double momentumRate, double a, double b
 					) {
 		this.argNumInputs = numInputs;
 		this.argNumHiddens = numHiddens;
@@ -47,8 +45,8 @@ public class NeuralNet implements NeuralNetInterface {
 		this.argMomentumRate = momentumRate;
 		this.argQMin = a;
 		this.argQMax = b;
-		this.inputData = inputData;
-		this.expectedOutput = expectedOutput;
+		//this.inputData = inputData;
+		//this.expectedOutput = expectedOutput;
 		this.setUpNetwork();
 		this.initializeWeights();
 	}
@@ -100,13 +98,7 @@ public class NeuralNet implements NeuralNetInterface {
 		return outputs;
 	}
 	
-	public ArrayList <Double> getErrorArray(){
-		return errorInEachEpoch;
-	}
-	
-	public void setErrorArray(ArrayList<Double> errors) {
-		errorInEachEpoch = errors;
-	}
+
 	
 	/*****
 	 * This method calculates the output of the NN based on the input 
@@ -138,7 +130,7 @@ public class NeuralNet implements NeuralNetInterface {
 	 * 
 	 * @return an array of results for each forwarding in a single epoch
 	 */
-	public double [][] getEpochResults() {
+	/*public double [][] getEpochResults() {
 		return epochOutput;
 	}
 	
@@ -149,7 +141,7 @@ public class NeuralNet implements NeuralNetInterface {
 				epochOutput[i][j] = results[i][j];
 			}
 		}
-	}
+	}*/
 	
 	/**
 	 * This perform backpropagation to update all the weight in this NN.
@@ -209,21 +201,16 @@ public class NeuralNet implements NeuralNetInterface {
 	 * This method performs one epoch of train to the NN.
 	 * @return accumulate squared error generated in one epoch.
 	 */
-	public double train(double [] argInputVector, double argTargetOutput) {
-		double totalError = 0.0;
-		for(int p = 0; p < inputData.length; p++) {
+	public double train(double [] argInputVector, double [] argTargetOutput) {
 			double error = 0.0;
-			double output[] = outputFor(inputData[p]);
-			epochOutput[p] = output;
-			for (int j = 0; j < expectedOutput[p].length; j++) {
-				double deltaErr = Math.pow((output[j]-expectedOutput[p][j]),2);
+			double output[] = outputFor(argInputVector);
+			for (int j = 0; j < argTargetOutput.length; j++) {
+				double deltaErr = Math.pow((output[j]-argTargetOutput[j]),2);
 				error = error + deltaErr;//sum of error for all  output neurons
 			}		
-			this.applyBackpropagation(expectedOutput[p]);
-			totalError = totalError + error;//Accumulated errors in one epoch
-		}
-		errorInEachEpoch.add(0.5*totalError);
-		return 0.5*totalError;
+			this.applyBackpropagation(argTargetOutput);
+		//errorInEachEpoch.add(0.5*totalError);
+		return 0.5*error;
 	}
 	
 	

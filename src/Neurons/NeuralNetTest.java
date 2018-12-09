@@ -3,6 +3,7 @@ import Neurons.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.junit.Ignore;
 import org.junit.Before;
@@ -24,6 +25,8 @@ public class NeuralNetTest {
 	private double momentumRate_2 = 0.9;
 	private double b_lowerBound = -1.0;
 	private double b_upperBound = 1.0;
+	
+	private ArrayList<Double> errorInEachEpoch;
 	
 	Neuron testNeuron = new Neuron("test");
 	@Before
@@ -60,7 +63,7 @@ public class NeuralNetTest {
 	@Ignore("Ignored")
 	@Test
 	public void testBipolarSigmoidDerivative() {
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,b_lowerBound,b_upperBound);
 
 		double x = 0.5;
 		double expectedResult = 0.375;
@@ -76,7 +79,7 @@ public class NeuralNetTest {
 	@Ignore("Ignored")
 	@Test
 	public void testCustomizedSigmoidDerivative() {
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound,u_inputData,u_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound);
 		double x = 0.5;
 		double expectedResult = 0.25;
 		double delta = 0.001;
@@ -90,7 +93,7 @@ public class NeuralNetTest {
 	@Ignore("Ignored")
 	@Test
 	public void testRandomWeightGenerator() {
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound,u_inputData,u_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound);
 		double actualResult = testNeuronNet.getRandom(-0.5, 0.5);
 		System.out.println(actualResult);
 		assertTrue("The output is out of range:"+actualResult, -0.5<=actualResult&&actualResult<=0.5);		
@@ -103,10 +106,10 @@ public class NeuralNetTest {
 	@Test
 	public void testUnipolarConverge() {
 		//testNeuronNet.zeroWeights();
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound,u_inputData,u_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,u_lowerBound,u_upperBound);
 		try {
-		testNeuronNet.tryConverge(10000, 0.05);
-		testNeuronNet.printRunResults(testNeuronNet.getErrorArray(), "unipolar.csv");
+		this.tryConverge(testNeuronNet,u_inputData,u_expectedOutput,10000, 0.05);
+		testNeuronNet.printRunResults(this.errorInEachEpoch, "unipolar.csv");
 		}
 		catch(IOException e){
 			System.out.println(e);
@@ -117,14 +120,14 @@ public class NeuralNetTest {
 	/*
 	 * This test tests the converge of neural network using bipolar representation.
 	 */
-	//@Ignore("Ignored")
+	@Ignore("Ignored")
 	@Test
 	public void testBipolarConverge() {
 		//testNeuronNet.zeroWeights();
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_1,b_lowerBound,b_upperBound);
 		try {
-		testNeuronNet.tryConverge(10000, 0.05);
-		testNeuronNet.printRunResults(testNeuronNet.getErrorArray(), "bipolar.csv");
+		this.tryConverge(testNeuronNet,b_inputData,b_expectedOutput,10000, 0.05);
+		testNeuronNet.printRunResults(this.errorInEachEpoch, "bipolar.csv");
 		}
 		catch(IOException e){
 			System.out.println(e);
@@ -137,10 +140,10 @@ public class NeuralNetTest {
 	@Test
 	public void testBipolarWithMomentumConverge() {
 		//testNeuronNet.zeroWeights();
-		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_2,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput);
+		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_2,b_lowerBound,b_upperBound);
 		try {
-		testNeuronNet.tryConverge(10000, 0.05);
-		testNeuronNet.printRunResults(testNeuronNet.getErrorArray(), "bipolarMomentum.csv");
+		this.tryConverge(testNeuronNet,b_inputData,b_expectedOutput,10000, 0.05);
+		testNeuronNet.printRunResults(this.errorInEachEpoch, "bipolarMomentum.csv");
 		}
 		catch(IOException e){
 			System.out.println(e);
@@ -164,7 +167,6 @@ public class NeuralNetTest {
 	 * This test tests the average converge performance of unipolar neural network.
 	 */
 	@Ignore("Ignored")
-
 	@Test
 	public void testBipolarAverage(){
 		int average = EpochAverage(momentumRate_1,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput,0.05,10000,1000);
@@ -174,7 +176,7 @@ public class NeuralNetTest {
 	/**
 	 * This test tests the average converge performance of bipolar neural network with momentum acceleration.
 	 */
-	@Ignore("Ignored")
+	//@Ignore("Ignored")
 	@Test
 	public void testBipolarWithMomentumAverage(){
 		int average = EpochAverage(momentumRate_2,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput,0.05,10000,1000);
@@ -201,11 +203,12 @@ public class NeuralNetTest {
 		failure = 0;
 		success = 0;
 		for(int i = 0; i < numTrials; i++) {
-			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound,input,expected); //Construct a new neural net object
+			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound); //Construct a new neural net object
+			errorInEachEpoch = new ArrayList<>();
 			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
-			epochNumber = testNeuronNet.getErrorArray().size(); //get the epoch number of this trial.
+			epochNumber = getErrorArray().size(); //get the epoch number of this trial.
 			if( epochNumber < maxSteps) {
-				average = average +  testNeuronNet.getErrorArray().size();
+				average = average +  epochNumber;
 				success ++; 
 			}
 			else {
@@ -224,19 +227,27 @@ public class NeuralNetTest {
 	 */
 	public void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
 		int i;
-		double error = 1;
-		for(i = 0; i < maxStep && error > minError; i++) {
-			error = 0;
-			for(int p = 0; p < input.length; p++) {
-				
-				error += theNet.train();
+		double totalerror = 1;
+		for(i = 0; i < maxStep && totalerror > minError; i++) {
+			totalerror = 0.0;
+			for(int j = 0; j < input.length; j++) {
+				totalerror += theNet.train(input[j],expected[j]);				
 			}
+			errorInEachEpoch.add(0.5*totalerror);
 		}
-		System.out.println("Sum of squared error in last epoch = " + error);
+		System.out.println("Sum of squared error in last epoch = " + totalerror);
 		System.out.println("Number of epoch: "+ i + "\n");
 		if(i == maxStep) {
 			System.out.println("Error in training, try again!");
 		}
+	}
+	
+	public ArrayList <Double> getErrorArray(){
+		return errorInEachEpoch;
+	}
+	
+	public void setErrorArray(ArrayList<Double> errors) {
+		errorInEachEpoch = errors;
 	}
 
 }
