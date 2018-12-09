@@ -30,7 +30,7 @@ public class rx78GunTank extends AdvancedRobot{
 	private double accumuReward = 0.0;
 	
 	private boolean interRewards = true;
-	private boolean isSARSA = true; //Switch between on policy and off policy, true = on-policy, false = off-policy
+	private boolean isSARSA = false; //Switch between on policy and off policy, true = on-policy, false = off-policy
 	//private PrintStream w = null;
 	public void run() {
 		lut = new LUT();
@@ -99,7 +99,7 @@ public class rx78GunTank extends AdvancedRobot{
 		else {
 			state = getState();//Get Last State
 			while(true) {
-				state = getState();//Get Last State
+				//state = getState();//Get Last State
 				turnRadarRightRadians(2*PI);					
 				action = agent.selectAction(state);					
 				switch(action) 
