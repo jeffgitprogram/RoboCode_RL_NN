@@ -295,7 +295,8 @@ public class rx78GunTank extends AdvancedRobot{
   		PrintStream w = null; 
   		try { 
   			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 
-  			w.println(accumuReward+" \t"+getRoundNum()+" \t"+winningTag+" \t"+LearningKernel.explorationRate); 
+  			//w.println(accumuReward+" \t"+getRoundNum()+" \t"+winningTag+" \t"+LearningKernel.explorationRate); 
+  			w.println(getRoundNum()+" \t"+winningTag);
   			if (w.checkError()) 
   				System.out.println("Could not save the data!");  //setTurnLeft(180 - (target.bearing + 90 - 30));
   				w.close(); 
@@ -327,7 +328,8 @@ public class rx78GunTank extends AdvancedRobot{
 		PrintStream w = null; 
 		try { 
 			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 
-			w.println(accumuReward+" \t"+getRoundNum()+" \t"+losingTag+" \t"+LearningKernel.explorationRate); 
+			//w.println(accumuReward+" \t"+getRoundNum()+" \t"+losingTag+" \t"+LearningKernel.explorationRate); 
+			w.println(getRoundNum()+" \t"+losingTag);
 			if (w.checkError()) 
 				System.out.println("Could not save the data!"); 
 			w.close(); 
