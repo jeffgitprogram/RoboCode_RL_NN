@@ -5,24 +5,29 @@ import robocode.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 
 public class LUTNeuralNet {
 	/***Test Data*****/	
-	private int numInput = States.NumStates;
-	private int numHidden = 4;
-	private int numOutput = 1;
-	private static double inputData[];	
-	private static double expectedOutput[][];
-	private double learningRate = 0.2;
-	private double momentumRate_1 = 0.0;
-	private double u_lowerBound = 0.0;
-	private double u_upperBound = 1.0;
-
+	private static int numInput = States.NumStates;
+	private static int numHidden = 10;
+	private static int numOutput = 1;
+	private static int numStateCategory = 6;
+	private static double expectedOutput[][]; //numStates*numActions
+	private static double learningRate = 0.2;
+	private static double momentumRate = 0.9;
+	private static double lowerBound = -1.0;
+	private static double upperBound = 1.0;
+	private static double maxQ = 120.0;
+	private static double minQ = -20.0;
 	
-	private ArrayList<Double> errorInEachEpoch;
+	
+	private static ArrayList<Double> errorInEachEpoch;
+	private static ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
 	
 	Neuron testNeuron = new Neuron("test");
 	
@@ -31,21 +36,35 @@ public class LUTNeuralNet {
 		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		File file = new File("LUT.dat");
 		lut.loadData(file);
+		double inputData[][] = new double [States.NumStates][numStateCategory];
+		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][numOutput][States.NumStates];
 		expectedOutput = lut.getTable();
-		//int index = States.getStateIndex(2, 5, 3,1,1, 0);
-		//int [] states = States.getStateFromIndex(index);
-		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			for(int state = 0; state < States.NumStates; state++) {
-				int states1[] = States.getStateFromIndex(state);
-				
+/*		int index = States.getStateIndex(2, 5, 3,1,1, 0);
+		int [] states = States.getStateFromIndex(index);
+		double [] normstates = normalizeInputData(states);
+		System.out.println(Arrays.toString(normstates));*/
+		//System.out.println(Double.toString(normalizeExpectedOutput(110,maxQ,minQ,upperBound,lowerBound)));
+
+		for(int stateid = 0; stateid < States.NumStates; stateid++) {
+			int[]state = States.getStateFromIndex(stateid);
+			inputData[stateid] = normalizeInputData(state);
+			for(int act = 0; act < Actions.NumRobotActions; act++) {
+				normExpectedOutput[act][numOutput-1][stateid] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
 			}
 		}
+		for(int act = 0; act < Actions.NumRobotActions; act++) {
+			NeuralNet newNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act);
+			neuralNetworks.add(newNet);
+		}
+		
+		
+		System.out.println("Test ends here");
 		
 	}
 	
-	public double [] normalizeInputData(int [] states) {
+	public static double [] normalizeInputData(int [] states) {
 		double [] normalizedStates = new double [6];
-		for(int i = 0; i < States.NumStates; i++) {
+		for(int i = 0; i < 6; i++) {
 			switch (i) {
 			case 0:
 				normalizedStates[0] = -1.0 + ((double)states[0])*2.0/((double)(States.NumHeading-1));
@@ -72,9 +91,18 @@ public class LUTNeuralNet {
 		return normalizedStates;
 	}
 	
-	public double normalizeExpectedOutput(double expected){
-		double normalizedexpected = 0.0;
-		return normalizedexpected;
+	public static double normalizeExpectedOutput(double expected, double max, double min, double upperbound, double lowerbound){
+		double normalizedExpected = 0.0;
+		if(expected > max) {
+			expected = max;
+		}else if(expected < min) {
+			expected = min;
+		}
+		
+			normalizedExpected = lowerbound +(expected-min)*(upperbound-lowerbound)/(max - min);
+		
+		
+		return normalizedExpected;
 	}
 	
 	
@@ -120,7 +148,7 @@ public class LUTNeuralNet {
 	 * @param maxStep
 	 * @param minError
 	 */
-	public void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
+	public static void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
 		int i;
 		double totalerror = 1;
 		for(i = 0; i < maxStep && totalerror > minError; i++) {
@@ -139,7 +167,7 @@ public class LUTNeuralNet {
 	
 	public ArrayList <Double> getErrorArray(){
 		return errorInEachEpoch;
-	}
+	} 
 	
 	public void setErrorArray(ArrayList<Double> errors) {
 		errorInEachEpoch = errors;
