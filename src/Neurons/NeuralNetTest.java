@@ -170,7 +170,7 @@ public class NeuralNetTest {
 	/**
 	 * This test tests the average converge performance of unipolar neural network.
 	 */
-	@Ignore("Ignored")
+	//@Ignore("Ignored")
 	@Test
 	public void testBipolarAverage(){
 		int average = EpochAverage(momentumRate_1,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput,0.05,10000,1000);
@@ -186,7 +186,7 @@ public class NeuralNetTest {
 		int average = EpochAverage(momentumRate_2,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput,0.05,10000,1000);
 		System.out.println("The average of number of epoches to converge is: "+average+"\n");
 	}
-	//@Ignore("Ignored")
+	@Ignore("Ignored")
 	@Test
 	public void testLoadingWeight(){
 		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_2,b_lowerBound,b_upperBound,1);
@@ -250,6 +250,7 @@ public class NeuralNetTest {
 			for(int j = 0; j < input.length; j++) {
 				totalerror += theNet.train(input[j],expected[j]);				
 			}
+			totalerror = totalerror*0.5;
 			errorInEachEpoch.add(totalerror);
 		}
 		System.out.println("Sum of squared error in last epoch = " + totalerror);

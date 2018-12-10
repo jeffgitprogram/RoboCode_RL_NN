@@ -52,11 +52,20 @@ public class LUTNeuralNet {
 				normExpectedOutput[act][stateid][numOutput-1] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
 			}
 		}
+		/*NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,0); //Construct a new neural net object
+		try {
+			tryConverge(testNeuronNet,inputData,normExpectedOutput[0],10000, 0.1);//Train the network with step and error constrains
+			testNeuronNet.printRunResults(errorInEachEpoch, "bipolarMomentum.csv");
+			//File file = new File("Weight_"+testNeuronNet.getNetID()+".txt");
+			//file.createNewFile();
+			//testNeuronNet.save(file);
+			}
+			catch(IOException e){
+				System.out.println(e);
+			}	*/
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			//NeuralNet newNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act);
-			//neuralNetworks.add(newNet);
-			EpochAverage(act,inputData,normExpectedOutput[act],0.1,10000,1000);
-			
+			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.1,10000,1000);
+			System.out.println("The average of number of epoches to converge is: "+average+"\n");
 		}
 		
 		
@@ -161,7 +170,9 @@ public class LUTNeuralNet {
 			for(int j = 0; j < input.length; j++) {
 				totalerror += theNet.train(input[j],expected[j]);				
 			}
-			errorInEachEpoch.add(0.5*totalerror);
+			//totalerror = totalerror*0.5;
+			totalerror = Math.sqrt(totalerror/input.length);
+			errorInEachEpoch.add(totalerror);
 		}
 		System.out.println("Sum of squared error in last epoch = " + totalerror);
 		System.out.println("Number of epoch: "+ i + "\n");

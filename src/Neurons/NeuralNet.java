@@ -214,7 +214,7 @@ public class NeuralNet implements NeuralNetInterface {
 			}		
 			this.applyBackpropagation(argTargetOutput);
 		//errorInEachEpoch.add(0.5*totalError);
-		return 0.5*error;
+		return error;
 	}
 	
 	
