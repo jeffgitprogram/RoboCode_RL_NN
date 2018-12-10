@@ -250,7 +250,7 @@ public class NeuralNetTest {
 			for(int j = 0; j < input.length; j++) {
 				totalerror += theNet.train(input[j],expected[j]);				
 			}
-			errorInEachEpoch.add(0.5*totalerror);
+			errorInEachEpoch.add(totalerror);
 		}
 		System.out.println("Sum of squared error in last epoch = " + totalerror);
 		System.out.println("Number of epoch: "+ i + "\n");

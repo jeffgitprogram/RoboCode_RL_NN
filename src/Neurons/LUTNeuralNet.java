@@ -13,12 +13,12 @@ import java.util.Arrays;
 
 public class LUTNeuralNet {
 	/***Test Data*****/	
-	private static int numInput = States.NumStates;
-	private static int numHidden = 10;
-	private static int numOutput = 1;
 	private static int numStateCategory = 6;
+	private static int numInput = numStateCategory;
+	private static int numHidden = 30;
+	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
-	private static double learningRate = 0.2;
+	private static double learningRate = 0.007;
 	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
@@ -37,7 +37,7 @@ public class LUTNeuralNet {
 		File file = new File("LUT.dat");
 		lut.loadData(file);
 		double inputData[][] = new double [States.NumStates][numStateCategory];
-		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][numOutput][States.NumStates];
+		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][States.NumStates][numOutput];
 		expectedOutput = lut.getTable();
 /*		int index = States.getStateIndex(2, 5, 3,1,1, 0);
 		int [] states = States.getStateFromIndex(index);
@@ -49,13 +49,16 @@ public class LUTNeuralNet {
 			int[]state = States.getStateFromIndex(stateid);
 			inputData[stateid] = normalizeInputData(state);
 			for(int act = 0; act < Actions.NumRobotActions; act++) {
-				normExpectedOutput[act][numOutput-1][stateid] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
+				normExpectedOutput[act][stateid][numOutput-1] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
 			}
 		}
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			NeuralNet newNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act);
-			neuralNetworks.add(newNet);
+			//NeuralNet newNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act);
+			//neuralNetworks.add(newNet);
+			EpochAverage(act,inputData,normExpectedOutput[act],0.1,10000,1000);
+			
 		}
+		
 		
 		
 		System.out.println("Test ends here");
@@ -119,15 +122,15 @@ public class LUTNeuralNet {
 	 * @param numTrials
 	 * @return the average of number of epochs
 	 */
-	public int EpochAverage(double momentum, double lowerbound, double upperbound, double[][] input, double[][] expected,double minError, int maxSteps, int numTrials) {
+	public static int EpochAverage(int act,double[][] input, double[][] expected,double minError, int maxSteps, int numTrials) {
 		int epochNumber, failure,success;
 		double average = 0f;
 		epochNumber = 0;
 		failure = 0;
 		success = 0;
+		NeuralNet testNeuronNet = null;
 		for(int i = 0; i < numTrials; i++) {
-			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound,1); //Construct a new neural net object
-			errorInEachEpoch = new ArrayList<>();
+			testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act); //Construct a new neural net object
 			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
 			epochNumber = getErrorArray().size(); //get the epoch number of this trial.
 			if( epochNumber < maxSteps) {
@@ -141,6 +144,7 @@ public class LUTNeuralNet {
 		double convergeRate = 100*success/(success+failure);
 		System.out.println("The net converges for "+convergeRate+" percent of the time.\n" );
 		average = average/success;
+		neuralNetworks.add(testNeuronNet);		
 		return (int)average;		
 	}	
 	/**
@@ -151,6 +155,7 @@ public class LUTNeuralNet {
 	public static void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
 		int i;
 		double totalerror = 1;
+		errorInEachEpoch = new ArrayList<>();
 		for(i = 0; i < maxStep && totalerror > minError; i++) {
 			totalerror = 0.0;
 			for(int j = 0; j < input.length; j++) {
@@ -165,11 +170,11 @@ public class LUTNeuralNet {
 		}
 	}
 	
-	public ArrayList <Double> getErrorArray(){
+	public static ArrayList <Double> getErrorArray(){
 		return errorInEachEpoch;
 	} 
 	
-	public void setErrorArray(ArrayList<Double> errors) {
+	public static void setErrorArray(ArrayList<Double> errors) {
 		errorInEachEpoch = errors;
 	}
 
