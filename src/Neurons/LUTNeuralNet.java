@@ -28,17 +28,18 @@ public class LUTNeuralNet {
 	
 	public static void main(String[] args){
 		LUT lut = new LUT();
-		File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
+		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
+		File file = new File("LUT.dat");
 		lut.loadData(file);
 		expectedOutput = lut.getTable();
 		//int index = States.getStateIndex(2, 5, 3,1,1, 0);
 		//int [] states = States.getStateFromIndex(index);
-		/*for(int act = 0; act < Actions.NumRobotActions; act++) {
+		for(int act = 0; act < Actions.NumRobotActions; act++) {
 			for(int state = 0; state < States.NumStates; state++) {
 				int states1[] = States.getStateFromIndex(state);
 				
 			}
-		}*/
+		}
 		
 	}
 	

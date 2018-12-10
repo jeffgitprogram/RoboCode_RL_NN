@@ -137,7 +137,7 @@ public class NeuralNetTest {
 	/*
 	 * This test tests the converge of neural network using bipolar representation with momentum.
 	 */
-	//@Ignore("Ignored")
+	@Ignore("Ignored")
 	@Test
 	public void testBipolarWithMomentumConverge() {
 		//testNeuronNet.zeroWeights();
@@ -186,13 +186,13 @@ public class NeuralNetTest {
 		int average = EpochAverage(momentumRate_2,b_lowerBound,b_upperBound,b_inputData,b_expectedOutput,0.05,10000,1000);
 		System.out.println("The average of number of epoches to converge is: "+average+"\n");
 	}
-	@Ignore("Ignored")
+	//@Ignore("Ignored")
 	@Test
 	public void testLoadingWeight(){
 		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_2,b_lowerBound,b_upperBound,1);
 		try {
 			//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\weight.txt");	
-			File file = new File("weight.txt");
+			File file = new File("Weight_1.txt");
 			testNeuronNet.load(file);			
 		}
 		catch(IOException e){
