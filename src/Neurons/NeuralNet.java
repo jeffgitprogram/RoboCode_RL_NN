@@ -11,6 +11,7 @@ import interfaces.NeuralNetInterface;
 
 public class NeuralNet implements NeuralNetInterface {
 	
+	private int netID;
 	private int argNumInputs;
 	private int argNumHiddens;
 	private int argNumOutputs;
@@ -35,7 +36,8 @@ public class NeuralNet implements NeuralNetInterface {
 	public NeuralNet(
 					int numInputs, int numHiddens, 
 					int numOutputs, double learningRate, 
-					double momentumRate, double a, double b
+					double momentumRate, double a, double b,
+					int id
 					) {
 		this.argNumInputs = numInputs;
 		this.argNumHiddens = numHiddens;
@@ -48,6 +50,7 @@ public class NeuralNet implements NeuralNetInterface {
 		//this.expectedOutput = expectedOutput;
 		this.setUpNetwork();
 		this.initializeWeights();
+		this.netID = id;
 	}
 	
 	public void setUpNetwork() {
@@ -97,7 +100,9 @@ public class NeuralNet implements NeuralNetInterface {
 		return outputs;
 	}
 	
-
+	public int getNetID(){
+		return this.netID;
+	}
 	
 	/*****
 	 * This method calculates the output of the NN based on the input 

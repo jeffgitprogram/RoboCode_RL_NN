@@ -43,17 +43,17 @@ public class LUTNeuralNet {
 	}
 	
 	public double [] normalizeInputData(int [] states) {
-		double [] normalizedStates = new double [5];
+		double [] normalizedStates = new double [6];
 		for(int i = 0; i < States.NumStates; i++) {
 			switch (i) {
 			case 0:
-				normalizedStates[0] = -1.0 + ((double)states[0])*2.0/3.0;
+				normalizedStates[0] = -1.0 + ((double)states[0])*2.0/((double)(States.NumHeading-1));
 				break;
 			case 1:
-				normalizedStates[1] = -1.0 + ((double)states[1])*2.0/9.0;
+				normalizedStates[1] = -1.0 + ((double)states[1])*2.0/((double)(States.NumTargetDistance-1));;
 				break;
 			case 2:
-				normalizedStates[2] = -1.0 + ((double)states[2])*2.0/3.0;
+				normalizedStates[2] = -1.0 + ((double)states[2])*2.0/((double)(States.NumTargetBearing-1));;
 				break;
 			case 3:
 				normalizedStates[3] = -1.0 + ((double)states[3])*2.0;
@@ -61,11 +61,19 @@ public class LUTNeuralNet {
 			case 4:
 				normalizedStates[4] = -1.0 + ((double)states[4])*2.0;
 				break;
+			case 5:
+				normalizedStates[5] = -1.0 + ((double)states[5])*2.0;
+				break;
 			default:
 				System.out.println("The data doesn't belong here.");
 			}
 		}
 		return normalizedStates;
+	}
+	
+	public double normalizeExpectedOutput(double expected){
+		double normalizedexpected = 0.0;
+		return normalizedexpected;
 	}
 	
 	
@@ -89,7 +97,7 @@ public class LUTNeuralNet {
 		failure = 0;
 		success = 0;
 		for(int i = 0; i < numTrials; i++) {
-			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound); //Construct a new neural net object
+			NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentum,lowerbound,upperbound,1); //Construct a new neural net object
 			errorInEachEpoch = new ArrayList<>();
 			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
 			epochNumber = getErrorArray().size(); //get the epoch number of this trial.
