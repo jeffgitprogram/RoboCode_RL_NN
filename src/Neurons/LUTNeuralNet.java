@@ -15,10 +15,10 @@ public class LUTNeuralNet {
 	/***Test Data*****/	
 	private static int numStateCategory = 6;
 	private static int numInput = numStateCategory;
-	private static int numHidden = 30;
+	private static int numHidden = 40;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
-	private static double learningRate = 0.007;
+	private static double learningRate = 0.005;
 	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
@@ -27,7 +27,8 @@ public class LUTNeuralNet {
 	
 	
 	private static ArrayList<Double> errorInEachEpoch;
-	private static ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
+	private static ArrayList<NeuralNet> neuralNetworks;
+
 	
 	Neuron testNeuron = new Neuron("test");
 	
@@ -52,9 +53,10 @@ public class LUTNeuralNet {
 				normExpectedOutput[act][stateid][numOutput-1] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
 			}
 		}
-		/*NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,0); //Construct a new neural net object
+		neuralNetworks = new ArrayList<NeuralNet>();
+/*		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,6); //Construct a new neural net object
 		try {
-			tryConverge(testNeuronNet,inputData,normExpectedOutput[0],10000, 0.1);//Train the network with step and error constrains
+			tryConverge(testNeuronNet,inputData,normExpectedOutput[6],10000, 0.13);//Train the network with step and error constrains
 			testNeuronNet.printRunResults(errorInEachEpoch, "bipolarMomentum.csv");
 			//File file = new File("Weight_"+testNeuronNet.getNetID()+".txt");
 			//file.createNewFile();
@@ -62,10 +64,21 @@ public class LUTNeuralNet {
 			}
 			catch(IOException e){
 				System.out.println(e);
-			}	*/
+			}*/	
+		
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.1,10000,1000);
-			System.out.println("The average of number of epoches to converge is: "+average+"\n");
+			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.13,10000,500);
+			System.out.println(act+"The average of number of epoches to converge is: "+average+"\n");
+		}
+		
+		for(NeuralNet net : neuralNetworks) {
+			try {
+					File weight = new File("Weight_"+net.getNetID()+".txt");
+					weight.createNewFile();
+					net.save(weight);
+			}catch(IOException e) {
+				System.out.println(e);
+			}
 		}
 		
 		
@@ -179,6 +192,7 @@ public class LUTNeuralNet {
 		if(i == maxStep) {
 			System.out.println("Error in training, try again!");
 		}
+		
 	}
 	
 	public static ArrayList <Double> getErrorArray(){
