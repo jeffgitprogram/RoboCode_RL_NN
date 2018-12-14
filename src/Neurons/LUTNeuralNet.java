@@ -46,8 +46,9 @@ public class LUTNeuralNet {
 		int [] states = States.getStateFromIndex(index);
 		double [] normstates = normalizeInputData(states);
 		System.out.println(Arrays.toString(normstates));*/
-		//System.out.println(Double.toString(normalizeExpectedOutput(110,maxQ,minQ,upperBound,lowerBound)));
-
+		/*double temp = normalizeExpectedOutput(20,maxQ,minQ,upperBound,lowerBound);
+		System.out.println(Double.toString(temp));
+		System.out.println(Double.toString(inverseMappingOutput(temp,maxQ,minQ,upperBound,lowerBound)));*/
 		for(int stateid = 0; stateid < States.NumStates; stateid++) {
 			int[]state = States.getStateFromIndex(stateid);
 			inputData[stateid] = normalizeInputData(state);
@@ -132,6 +133,16 @@ public class LUTNeuralNet {
 		return normalizedExpected;
 	}
 	
+	public static double inverseMappingOutput(double output, double maxQ, double minQ, double upperbound, double lowerbound) {
+		double QValue = 0.0;
+		if(QValue < -1.0) {
+			QValue = -1.0;
+		}else if(QValue > 1.0) {
+			QValue = 1.0;
+		}
+		QValue = minQ + (output-lowerbound)/(upperbound-lowerbound)*(maxQ - minQ);
+		return QValue;
+	}
 	
 	/***
 	 * This function calculates the average of amount of epoch that one trial of network training takes, 

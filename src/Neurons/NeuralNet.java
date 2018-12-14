@@ -265,6 +265,34 @@ public class NeuralNet implements NeuralNetInterface {
 		}
 
 	}
+	
+	public void save_robot(File argFile) {
+		PrintStream savefile = null;
+		try{
+			savefile = new PrintStream(new RobocodeFileOutputStream(argFile));
+			savefile.println(outputLayerNeurons.size());
+			savefile.println(hiddenLayerNeurons.size());
+			savefile.println(inputLayerNeurons.size());
+			for(Neuron output : outputLayerNeurons){
+				ArrayList<NeuronConnection> connections = output.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					savefile.println(link.getWeight());
+				}
+			}
+			for(Neuron hidden: hiddenLayerNeurons) {
+				ArrayList<NeuronConnection> connections = hidden.getInputConnectionList();
+				for(NeuronConnection link : connections){
+					savefile.println(link.getWeight());
+				}
+			}
+			savefile.flush();
+			savefile.close();				
+		}
+		catch(IOException e){
+			System.out.println("Cannot save the weight table.");
+		}
+
+	}
 
 	@Override
 	public void load(File argFileName) throws IOException {

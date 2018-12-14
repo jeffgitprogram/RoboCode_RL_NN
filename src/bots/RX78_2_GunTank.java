@@ -6,7 +6,7 @@ import java.io.PrintStream;
 import robocode.*;
 
 import learning.*;
-
+import Neurons.*;
 //API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
 
@@ -35,7 +35,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	//private PrintStream w = null;
 	public void run() {
 		lut = new LUT();
-		loadData();
+		//loadData();
 		agent = new LearningKernel(lut);
 		target = new Target();
 		target.setDistance(100000);
@@ -98,11 +98,20 @@ public class RX78_2_GunTank extends AdvancedRobot{
 			}
 		}
 		else if(isOnline){
-			state = getState();//Get Last State
+			agent.initializeNeuralNetworks();
+			for(NeuralNet theNet: agent.getNeuralNetworks()) {
+				try {
+					theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			state = getState();//Get Initial State
 			while(true) {
-				//state = getState();//Get Last State
-				turnRadarRightRadians(2*PI);					
-				action = agent.selectAction(state);					
+				turnRadarRightRadians(2*PI);
+				agent.setCurrentStateArray(state);
+				action = agent.nn_selectAction();
 				switch(action) 
 			{
 				case Actions.RobotAhead:
@@ -141,7 +150,8 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				turnRadarRightRadians(2*PI);
 				//Update states
 				state = getState();
-				agent.QLearn(state, action, reward);
+				agent.setNewStateArray(state);
+				agent.nn_QLearn(action, reward);
 				accumuReward += reward;					
 				//Reset Values
 				reward = 0.0d;
@@ -347,6 +357,11 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		//moveRobot();
 		saveData();   
   		int winningTag=1;
+  		
+  		for(NeuralNet net : agent.getNeuralNetworks())
+  		{
+  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+  		}
 
   		PrintStream w = null; 
   		try { 
@@ -381,6 +396,10 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		saveData();  
        
 		int losingTag=0;
+		for(NeuralNet net : agent.getNeuralNetworks())
+  		{
+  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+  		}
 		PrintStream w = null; 
 		try { 
 			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 

@@ -1,9 +1,10 @@
 package learning;
+import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.Random;
 
-import Neurons.NeuralNet;
+import Neurons.*;
 public class LearningKernel {
 	public static final double LearningRate = 0.3;   // alpha
 	public static final double DiscountRate = 0.9;   // gamma
@@ -33,7 +34,7 @@ public class LearningKernel {
 	private double newActionOutput[] = new double [numNerualNet];
 	private double newQValue[] =  new double [numNerualNet];
 	
-	private static ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
+	private ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
 	
 	public LearningKernel (LUT table) {
 		this.lut = table;
@@ -86,6 +87,59 @@ public class LearningKernel {
 		}
 		return action;
 	}
+	//Always select action based on current state, current state is the state before an action is executed in each iteration
+	public int nn_selectAction() {
+		double epsl = Math.random();
+		int action = 0;
+		double [] inputData = LUTNeuralNet.normalizeInputData(getCurrentStateArray());
+		if(epsl < explorationRate) {
+			Random rand = new Random();
+			action = rand.nextInt(Actions.NumRobotActions);//Exploration Move
+		}else {
+			//Greedy Move
+			for(NeuralNet theNet : neuralNetworks) {
+				double currentNetOutput = theNet.outputFor(inputData)[0];
+				double currentNetQValue = LUTNeuralNet.inverseMappingOutput(currentNetOutput, maxQ, minQ, upperBound, lowerBound);//Reverse map output to big scale
+				int currentNetIndex = theNet.getNetID();
+				setCurrentActionValue(currentNetOutput,currentNetIndex);//Probably wrong
+				setCurrentQValue(currentNetQValue,currentNetIndex);
+			}
+			
+			action = getMaxIndex(getCurrentActionValues());
+			//double maxNNOutput = getNewActionValues()[bestAction];	
+			
+		}
+		return action;
+	}
+	
+	public void nn_QLearn( int action, double reward) {
+		//Need to make currentData Array and new Data array is set before calling this function
+		double currentStateQValue = getCurrentQValues()[action] ;
+		double [] newInputData = new double[numStateCategory];
+		newInputData = LUTNeuralNet.normalizeInputData(getNewStateArray());
+		for(NeuralNet theNet: neuralNetworks) {
+			double tempOutput = theNet.outputFor(newInputData)[0];
+			double tempQValue = LUTNeuralNet.inverseMappingOutput(tempOutput, maxQ, minQ, upperBound, lowerBound);
+			setNewActionValue(tempOutput,theNet.getNetID());
+			setNewQValue(tempQValue,theNet.getNetID());
+		}//Update the NewActionValue and newQValues Arrays
+		
+		int maxNewStateActionIndex = getMaxIndex(getNewActionValues());
+		double maxNewQValue = getNewQValues()[maxNewStateActionIndex];
+		double expectedQValue = currentStateQValue + LearningRate*(reward + DiscountRate *maxNewQValue -currentStateQValue); 
+		double [] expectedOutput = new double[1];
+		expectedOutput[0] = LUTNeuralNet.normalizeExpectedOutput(expectedQValue, maxQ, minQ, upperBound, lowerBound);
+		NeuralNet learningNet = neuralNetworks.get(action);
+		double [] currentInputData = LUTNeuralNet.normalizeInputData(getCurrentStateArray());
+		learningNet.train(currentInputData, expectedOutput);
+	}
+	
+	public void initializeNeuralNetworks(){
+		for(int i = 0; i < Actions.NumRobotActions; i++) {
+			NeuralNet theNewNet = new NeuralNet(numInput,numHidden,numOutput,learningRate_NN,momentumRate,lowerBound,upperBound,i);
+			neuralNetworks.add(theNewNet);
+		}
+	}
 	
 	public void setCurrentStateArray (int state) {
 		currentStateArray = States.getStateFromIndex(state);
@@ -101,6 +155,62 @@ public class LearningKernel {
 	public int [] getNewStateArray(){
 		return this.newStateArray;
 	}
+	
+	public void setCurrentActionValues(double [] theValues) {
+		currentActionOutput = theValues;
+	}
+	public void setCurrentActionValue(double theValues, int theIndex) {
+		currentActionOutput[theIndex] = theValues;
+	}
+	public double [] getCurrentActionValues() {
+		return this.currentActionOutput;
+	}
+	
+	public void setNewActionValues(double [] theValues) {
+		newActionOutput = theValues;
+	}
+	public void setNewActionValue(double theValues, int theIndex) {
+		newActionOutput[theIndex] = theValues;
+	}
+	public double [] getNewActionValues() {
+		return this.newActionOutput;
+	}
+	public void setCurrentQValues(double [] theValues) {
+		currentQValue = theValues;
+	}
+	public void setCurrentQValue(double theValues, int theIndex) {
+		currentQValue[theIndex] = theValues;
+	}
+	public double [] getCurrentQValues() {
+		return this.currentQValue;
+	}
+	
+	public void setNewQValues(double [] theValues) {
+		newQValue = theValues;
+	}
+	public void setNewQValue(double theValues, int theIndex) {
+		newQValue[theIndex] = theValues;
+	}
+	public double [] getNewQValues() {
+		return this.newQValue;
+	}
+	
+	public ArrayList<NeuralNet> getNeuralNetworks(){
+		return this.neuralNetworks;
+	}
+	
+	public int getMaxIndex(double [] theValues) {
+		double maxQValue = theValues[0];
+		int maxIndex = 0;
+		for(int i = 0; i < theValues.length; i++) {
+			if(maxQValue < theValues[i]) {
+				maxQValue = theValues[i];
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
+	} 
+	
 	
 	
 }
