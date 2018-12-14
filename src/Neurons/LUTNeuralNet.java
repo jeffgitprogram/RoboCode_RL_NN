@@ -1,5 +1,6 @@
 package Neurons;
 import Neurons.*;
+import bots.RX78_2_GunTank;
 import learning.*;
 import robocode.*;
 
@@ -34,6 +35,7 @@ public class LUTNeuralNet {
 	
 	public static void main(String[] args){
 		LUT lut = new LUT();
+		//RX78_2_GunTank robot = new RX78_2_GunTank();
 		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		File file = new File("LUT.dat");
 		lut.loadData(file);
@@ -73,7 +75,7 @@ public class LUTNeuralNet {
 		
 		for(NeuralNet net : neuralNetworks) {
 			try {
-					File weight = new File("Weight_"+net.getNetID()+".txt");
+					File weight = new File("Weight_"+net.getNetID()+".dat");
 					weight.createNewFile();
 					net.save(weight);
 			}catch(IOException e) {

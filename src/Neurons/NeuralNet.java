@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import interfaces.NeuralNetInterface;
+import robocode.RobocodeFileOutputStream;
 
 public class NeuralNet implements NeuralNetInterface {
 	
