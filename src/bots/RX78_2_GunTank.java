@@ -31,6 +31,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	
 	private boolean interRewards = true;
 	private boolean isSARSA = false; //Switch between on policy and off policy, true = on-policy, false = off-policy
+	private boolean isOnline = true;
 	//private PrintStream w = null;
 	public void run() {
 		lut = new LUT();
@@ -90,6 +91,58 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				agent.SARSLearn(state, action, reward);
 				accumuReward += reward;
 				
+				//Reset Values
+				reward = 0.0d;
+				isHitWall = 0;
+				isHitByBullet = 0;
+			}
+		}
+		else if(isOnline){
+			state = getState();//Get Last State
+			while(true) {
+				//state = getState();//Get Last State
+				turnRadarRightRadians(2*PI);					
+				action = agent.selectAction(state);					
+				switch(action) 
+			{
+				case Actions.RobotAhead:
+					setAhead(Actions.RobotMoveDistance);
+					break;
+				case Actions.RobotBack:
+					setBack(Actions.RobotMoveDistance);
+					break;
+				case Actions.RobotAheadTurnLeft:
+					setAhead(Actions.RobotMoveDistance);
+					setTurnLeft(Actions.RobotTurnDegree);
+					break;
+				case Actions.RobotAheadTurnRight:
+					setAhead(Actions.RobotMoveDistance);
+					setTurnRight(Actions.RobotTurnDegree);
+					break;
+				case Actions.RobotBackTurnLeft:
+					setBack(Actions.RobotMoveDistance);
+					setTurnLeft(Actions.RobotTurnDegree);
+					break;
+				case Actions.RobotBackTurnRight:
+					setBack(Actions.RobotMoveDistance);
+					setTurnRight(Actions.RobotTurnDegree);
+					break;
+				case Actions.RobotFire:
+					ahead(0);
+					turnLeft(0);
+					scanAndFire();
+					break;
+				default:
+					System.out.println("Action Not Found");
+					break;
+				
+				}					
+				execute();					
+				turnRadarRightRadians(2*PI);
+				//Update states
+				state = getState();
+				agent.QLearn(state, action, reward);
+				accumuReward += reward;					
 				//Reset Values
 				reward = 0.0d;
 				isHitWall = 0;
