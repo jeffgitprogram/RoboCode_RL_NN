@@ -240,7 +240,7 @@ public class NeuralNet implements NeuralNetInterface {
 	public void save(File argFile) {
 		PrintStream savefile = null;
 		try{
-			savefile = new PrintStream(new FileOutputStream(argFile) );
+			savefile = new PrintStream(new FileOutputStream(argFile,false) );
 			savefile.println(outputLayerNeurons.size());
 			savefile.println(hiddenLayerNeurons.size());
 			savefile.println(inputLayerNeurons.size());
