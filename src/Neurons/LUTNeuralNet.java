@@ -16,10 +16,10 @@ public class LUTNeuralNet {
 	/***Test Data*****/	
 	private static int numStateCategory = 6;
 	private static int numInput = numStateCategory;
-	private static int numHidden = 30;
+	private static int numHidden = 40;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
-	private static double learningRate = 0.005;
+	private static double learningRate = 0.003;
 	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
@@ -78,7 +78,7 @@ public class LUTNeuralNet {
 			}*/	
 		
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.00001,10000,1);
+			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.000005,10000,1);
 			System.out.println(act+"The average of number of epoches to converge is: "+average+"\n");
 		}
 		

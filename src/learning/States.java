@@ -1,9 +1,9 @@
 package learning;
 
 public class States {
-	public static final int NumHeading = 8;  //Four states, up, right, down, left
+	public static final int NumHeading = 4;  //Four states, up, right, down, left
 	public static final int NumTargetDistance = 10;  //Ten levels of distance
-	public static final int NumTargetBearing = 8;  
+	public static final int NumTargetBearing = 4;  
 	//public static final int NumHitWall = 2;  
 	public static final int NumHorizontalPositionUnsafe = 2; 
 	public static final int NumVerticalPositionUnsafe = 2; 
@@ -33,7 +33,7 @@ public class States {
 		int value = (int)(newHeading / unit);
 		if(value > NumHeading-1) value = NumHeading-1;
 		if(value < 0) value = 0;
-		return (int)(newHeading / unit);  
+		return (int)(value);  
 	} 
 	
 	public static int getTargetDistance(double value)  {  
@@ -54,7 +54,7 @@ public class States {
 		int value = (int)(newBearing / unit);
 		if(value > NumTargetBearing-1) value = NumTargetBearing-1;
 		if(value < 0) value = 0;
-		return (int)(newBearing / unit);  
+		return (int)(value);  
 	} 
 	
 	public static int getHorizontalPositionUnsafe (double robotX, double BattleFieldX)  {
