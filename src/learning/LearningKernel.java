@@ -2,6 +2,7 @@ package learning;
 import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import Neurons.*;
@@ -13,6 +14,7 @@ public class LearningKernel {
 	private int currentAction;
 	private boolean isFirstRound = true;
 	private LUT lut; 
+	private NeuralNet neuralNet;
 	
 	/***NeuralNet Parameters*****/	
 	private static int numStateCategory = 6;
@@ -23,25 +25,33 @@ public class LearningKernel {
 	private static double momentumRate = LUTNeuralNet.getMomentumRate();
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
-	private double [] maxQ = new double[Actions.NumRobotActions];
-	private double [] minQ = new double[Actions.NumRobotActions];
-	private static int numNerualNet = 7;
+	private double maxQ;
+	private double minQ;
+	//private static int numNerualNet = 7;
 	
 	private int[] currentStateArray = new int [numStateCategory];
 	private int[]  newStateArray = new int [numStateCategory];
-	private double currentActionOutput [] = new double [numNerualNet];
-	private double currentQValue[] = new double [numNerualNet];
-	private double newActionOutput[] = new double [numNerualNet];
-	private double newQValue[] =  new double [numNerualNet];
+	private double currentActionOutput [] = new double [Actions.NumRobotActions];
+	private double currentQValue[] = new double [Actions.NumRobotActions];
+	private double newActionOutput[] = new double [Actions.NumRobotActions];
+	private double newQValue[] =  new double [Actions.NumRobotActions];
 	
-	private ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
+	//private ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
 	
 	public LearningKernel (LUT table) {
 		this.lut = table;
 		for(int act = 0; act<Actions.NumRobotActions;act++) {
-			maxQ[act] = LUTNeuralNet.findMax(getColumn(lut.getTable(),act));
-			minQ[act] = LUTNeuralNet.findMin(getColumn(lut.getTable(),act));
-		} 
+			if(LUTNeuralNet.findMax(getColumn(lut.getTable(),act))> maxQ) 
+			{
+				maxQ = LUTNeuralNet.findMax(getColumn(lut.getTable(),act));
+			}
+			if(minQ > LUTNeuralNet.findMin(getColumn(lut.getTable(),act))) 
+			{
+				minQ = LUTNeuralNet.findMin(getColumn(lut.getTable(),act));
+			}
+		}//Find min and max of the whole LUT
+		maxQ = (int)maxQ+5;
+		minQ = (int)minQ-5;
 		System.out.println("break here.");
 	}
 	
@@ -96,24 +106,22 @@ public class LearningKernel {
 	public int nn_selectAction() {
 		double epsl = Math.random();
 		int action = 0;
-		double [] inputData = LUTNeuralNet.normalizeInputData(getCurrentStateArray());
+		double [] inputData = null;
 		if(epsl < explorationRate) {
 			Random rand = new Random();
 			action = rand.nextInt(Actions.NumRobotActions);//Exploration Move
 		}else {
 			//Greedy Move
-			for(NeuralNet theNet : neuralNetworks) {
-				int act = theNet.getNetID();
-				double currentNetOutput = theNet.outputFor(inputData)[0];
-				double currentNetQValue = LUTNeuralNet.inverseMappingOutput(currentNetOutput, maxQ[act], minQ[act], upperBound, lowerBound);//Reverse map output to big scale
-				int currentNetIndex = theNet.getNetID();
-				setCurrentActionValue(currentNetOutput,currentNetIndex);//Probably wrong
-				setCurrentQValue(currentNetQValue,currentNetIndex);
-			}
-			
-			action = getMaxIndex(getCurrentActionValues());
-			//double maxNNOutput = getNewActionValues()[bestAction];	
-			
+			int[] state_with_action = Arrays.copyOf(getCurrentStateArray(), getCurrentStateArray().length+1);
+			for(int act = 0; act<Actions.NumRobotActions; act++) {
+				state_with_action[state_with_action.length-1]= act;
+				inputData = LUTNeuralNet.normalizeInputData(state_with_action);
+				double currentNetOutput = neuralNet.outputFor(inputData)[0];
+				double currentNetQValue = LUTNeuralNet.inverseMappingOutput(currentNetOutput, maxQ, minQ, upperBound, lowerBound);//Reverse map output to big scale
+				setCurrentActionValue(currentNetOutput,act);//Probably wrong
+				setCurrentQValue(currentNetQValue,act);
+			}			
+			action = getMaxIndex(getCurrentQValues());	
 		}
 		return action;
 	}
@@ -121,31 +129,30 @@ public class LearningKernel {
 	public void nn_QLearn( int action, double reward) {
 		//Need to make currentData Array and new Data array is set before calling this function
 		double currentStateQValue = getCurrentQValues()[action] ;
-		double [] newInputData = new double[numStateCategory];
-		newInputData = LUTNeuralNet.normalizeInputData(getNewStateArray());
-		for(NeuralNet theNet: neuralNetworks) {
-			int act = theNet.getNetID();
-			double tempOutput = theNet.outputFor(newInputData)[0];
-			double tempQValue = LUTNeuralNet.inverseMappingOutput(tempOutput, maxQ[act], minQ[act], upperBound, lowerBound);
-			setNewActionValue(tempOutput,theNet.getNetID());
-			setNewQValue(tempQValue,theNet.getNetID());
+		double [] newInputData = null;
+		int[] state_with_action = Arrays.copyOf(getNewStateArray(), getNewStateArray().length+1);		
+		for(int act = 0; act<Actions.NumRobotActions; act++) {
+			state_with_action[state_with_action.length-1]= act;//Combine the state input with a selected act
+			newInputData = LUTNeuralNet.normalizeInputData(state_with_action);
+			double tempOutput = neuralNet.outputFor(newInputData)[0];
+			double tempQValue = LUTNeuralNet.inverseMappingOutput(tempOutput, maxQ, minQ, upperBound, lowerBound);
+			setNewActionValue(tempOutput,act);
+			setNewQValue(tempQValue,act);
 		}//Update the NewActionValue and newQValues Arrays
 		
-		int maxNewStateActionIndex = getMaxIndex(getNewActionValues());
+		int maxNewStateActionIndex = getMaxIndex(getNewQValues());
 		double maxNewQValue = getNewQValues()[maxNewStateActionIndex];
 		double expectedQValue = currentStateQValue + LearningRate*(reward + DiscountRate *maxNewQValue -currentStateQValue); 
 		double [] expectedOutput = new double[1];
-		expectedOutput[0] = LUTNeuralNet.normalizeExpectedOutput(expectedQValue, maxQ[action], minQ[action], upperBound, lowerBound);
-		NeuralNet learningNet = neuralNetworks.get(action);
-		double [] currentInputData = LUTNeuralNet.normalizeInputData(getCurrentStateArray());
-		learningNet.train(currentInputData, expectedOutput);
+		expectedOutput[0] = LUTNeuralNet.normalizeExpectedOutput(expectedQValue, maxQ, minQ, upperBound, lowerBound);
+		int[] current_State_Action = Arrays.copyOf(getCurrentStateArray(), getCurrentStateArray().length+1);
+		current_State_Action[current_State_Action.length-1] = action;
+		double [] currentInputData = LUTNeuralNet.normalizeInputData(current_State_Action);
+		neuralNet.train(currentInputData, expectedOutput);
 	}
 	
 	public void initializeNeuralNetworks(){
-		for(int i = 0; i < Actions.NumRobotActions; i++) {
-			NeuralNet theNewNet = new NeuralNet(numInput,numHidden,numOutput,learningRate_NN,momentumRate,lowerBound,upperBound,i);
-			neuralNetworks.add(theNewNet);
-		}
+		neuralNet = new NeuralNet(numInput,numHidden,numOutput,learningRate_NN,momentumRate,lowerBound,upperBound,0);
 	}
 	
 	public void setCurrentStateArray (int state) {
@@ -202,8 +209,8 @@ public class LearningKernel {
 		return this.newQValue;
 	}
 	
-	public ArrayList<NeuralNet> getNeuralNetworks(){
-		return this.neuralNetworks;
+	public NeuralNet getNeuralNetwork(){
+		return this.neuralNet;
 	}
 	
 	public int getMaxIndex(double [] theValues) {

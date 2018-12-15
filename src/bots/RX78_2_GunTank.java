@@ -102,22 +102,18 @@ public class RX78_2_GunTank extends AdvancedRobot{
 			agent.initializeNeuralNetworks();
 			if(isNaive) {
 				if(getRoundNum()>0) {
-					for(NeuralNet theNet: agent.getNeuralNetworks()) {
 						try {
-							theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
+							agent.getNeuralNetwork().load(getDataFile("Weight.dat"));
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}
 				}
 			}
 			else {
-				for(NeuralNet theNet: agent.getNeuralNetworks()) {
-					try {
-						theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				try {
+					agent.getNeuralNetwork().load(getDataFile("Weight.dat"));
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 			
@@ -371,10 +367,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		if(!isOnline) saveData();   
   		int winningTag=1;
   		if(isOnline) {
-	  		for(NeuralNet net : agent.getNeuralNetworks())
-	  		{
-	  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
-	  		}
+	  		agent.getNeuralNetwork().save_robot(getDataFile("Weight.dat"));
   		}
   		PrintStream w = null; 
   		try { 
@@ -409,10 +402,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
        
 		int losingTag=0;
   		if(isOnline) {
-	  		for(NeuralNet net : agent.getNeuralNetworks())
-	  		{
-	  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
-	  		}
+	  			agent.getNeuralNetwork().save_robot(getDataFile("Weight.dat"));
   		}
 		PrintStream w = null; 
 		try { 
