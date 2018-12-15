@@ -19,7 +19,7 @@ public class LUTNeuralNet {
 	private static int numHidden = 40;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
-	private static double learningRate = 0.003;
+	private static double learningRate = 0.005;
 	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;

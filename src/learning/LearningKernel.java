@@ -39,8 +39,8 @@ public class LearningKernel {
 	public LearningKernel (LUT table) {
 		this.lut = table;
 		for(int act = 0; act<Actions.NumRobotActions;act++) {
-			maxQ[act] = LUTNeuralNet.findMax(getColumn(lut.getTable(),act));
-			minQ[act] = LUTNeuralNet.findMin(getColumn(lut.getTable(),act));
+			maxQ[act] = 5+LUTNeuralNet.findMax(getColumn(lut.getTable(),act));
+			minQ[act] = -5+LUTNeuralNet.findMin(getColumn(lut.getTable(),act));
 		} 
 		System.out.println("break here.");
 	}
