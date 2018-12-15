@@ -16,11 +16,11 @@ public class LUTNeuralNet {
 	/***Test Data*****/	
 	private static int numStateCategory = 6;
 	private static int numInput = numStateCategory;
-	private static int numHidden = 50;
+	private static int numHidden = 40;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
 	private static double learningRate = 0.005;
-	private static double momentumRate = 0.7;
+	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
 	private static double [] maxQ = new double[Actions.NumRobotActions];
