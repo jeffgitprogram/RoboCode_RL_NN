@@ -16,7 +16,7 @@ public class LUTNeuralNet {
 	/***Test Data*****/	
 	private static int numStateCategory = 6;
 	private static int numInput = numStateCategory;
-	private static int numHidden = 40;
+	private static int numHidden = 30;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
 	private static double learningRate = 0.005;
@@ -39,8 +39,8 @@ public class LUTNeuralNet {
 		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		File file = new File("LUT.dat");
 		lut.loadData(file);
-		double inputData[][] = new double [States.NumStates][numStateCategory];
-		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][States.NumStates][numOutput];
+		double inputData[][] = new double [LUT.numStates][numStateCategory];
+		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][LUT.numStates][numOutput];
 		expectedOutput = lut.getTable();
 /*		int index = States.getStateIndex(2, 5, 3,1,1, 0);
 		int [] states = States.getStateFromIndex(index);
@@ -57,7 +57,7 @@ public class LUTNeuralNet {
 			maxQ[act] = findMax(getColumn(expectedOutput,act));
 			minQ[act] = findMin(getColumn(expectedOutput,act));
 		}
-		for(int stateid = 0; stateid < States.NumStates; stateid++) {
+		for(int stateid = 0; stateid < LUT.numStates; stateid++) {
 			int[]state = States.getStateFromIndex(stateid);
 			inputData[stateid] = normalizeInputData(state);
 			for(int act = 0; act < Actions.NumRobotActions; act++) {
@@ -78,7 +78,7 @@ public class LUTNeuralNet {
 			}*/	
 		
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.0001,10000,1);
+			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.00001,10000,1);
 			System.out.println(act+"The average of number of epoches to converge is: "+average+"\n");
 		}
 		
@@ -142,10 +142,10 @@ public class LUTNeuralNet {
 	
 	public static double inverseMappingOutput(double output, double maxQ, double minQ, double upperbound, double lowerbound) {
 		double QValue = 0.0;
-		if(QValue < -1.0) {
-			QValue = -1.0;
-		}else if(QValue > 1.0) {
-			QValue = 1.0;
+		if(output < -1.0) {
+			output = -1.0;
+		}else if(output > 1.0) {
+			output = 1.0;
 		}
 		QValue = minQ + (output-lowerbound)/(upperbound-lowerbound)*(maxQ - minQ);
 		return QValue;
@@ -252,7 +252,7 @@ public class LUTNeuralNet {
 		return minQValue;
 	} 
 	public static double[] getColumn(double[][] array, int index){
-	    double[] column = new double[States.NumStates]; // 
+	    double[] column = new double[LUT.numStates]; // 
 	    for(int i=0; i<column.length; i++){
 	       column[i] = array[i][index];
 	    }

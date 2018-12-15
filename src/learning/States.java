@@ -1,9 +1,9 @@
 package learning;
 
 public class States {
-	public static final int NumHeading = 16;  //Four states, up, right, down, left
-	public static final int NumTargetDistance = 50;  //Ten levels of distance
-	public static final int NumTargetBearing = 16;  
+	public static final int NumHeading = 8;  //Four states, up, right, down, left
+	public static final int NumTargetDistance = 10;  //Ten levels of distance
+	public static final int NumTargetBearing = 8;  
 	//public static final int NumHitWall = 2;  
 	public static final int NumHorizontalPositionUnsafe = 2; 
 	public static final int NumVerticalPositionUnsafe = 2; 
@@ -29,7 +29,10 @@ public class States {
 		double unit = 360 / NumHeading;  
 		double newHeading = heading + unit / 2;  
 		if (newHeading > 360.0)  
-		  newHeading -= 360.0;  
+		  newHeading -= 360.0;
+		int value = (int)(newHeading / unit);
+		if(value > NumHeading-1) value = NumHeading-1;
+		if(value < 0) value = 0;
 		return (int)(newHeading / unit);  
 	} 
 	
@@ -47,7 +50,10 @@ public class States {
 		double unit = pi_2 / NumTargetBearing;  
 		double newBearing = bearing + unit / 2;  
 		if (newBearing > pi_2)  
-			newBearing -= pi_2;  
+			newBearing -= pi_2; 
+		int value = (int)(newBearing / unit);
+		if(value > NumTargetBearing-1) value = NumTargetBearing-1;
+		if(value < 0) value = 0;
 		return (int)(newBearing / unit);  
 	} 
 	

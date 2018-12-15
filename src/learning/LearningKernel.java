@@ -111,7 +111,7 @@ public class LearningKernel {
 				setCurrentQValue(currentNetQValue,currentNetIndex);
 			}
 			
-			action = getMaxIndex(getCurrentActionValues());
+			action = getMaxIndex(getCurrentQValues());
 			//double maxNNOutput = getNewActionValues()[bestAction];	
 			
 		}
@@ -131,7 +131,7 @@ public class LearningKernel {
 			setNewQValue(tempQValue,theNet.getNetID());
 		}//Update the NewActionValue and newQValues Arrays
 		
-		int maxNewStateActionIndex = getMaxIndex(getNewActionValues());
+		int maxNewStateActionIndex = getMaxIndex(getNewQValues());
 		double maxNewQValue = getNewQValues()[maxNewStateActionIndex];
 		double expectedQValue = currentStateQValue + LearningRate*(reward + DiscountRate *maxNewQValue -currentStateQValue); 
 		double [] expectedOutput = new double[1];
@@ -219,7 +219,7 @@ public class LearningKernel {
 	} 
 	
 	public double[] getColumn(double[][] array, int index){
-		double[] column = new double[States.NumStates]; // 
+		double[] column = new double[LUT.numStates]; // 
 	    for(int i=0; i<column.length; i++){
 	       column[i] = array[i][index];
 	    }

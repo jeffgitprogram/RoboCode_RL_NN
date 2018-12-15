@@ -97,8 +97,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				isHitWall = 0;
 				isHitByBullet = 0;
 			}
-		}
-		else if(isOnline){
+		}else if(isOnline){
 			agent.initializeNeuralNetworks();
 			if(isNaive) {
 				if(getRoundNum()>0) {

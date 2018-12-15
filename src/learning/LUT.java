@@ -9,14 +9,15 @@ import robocode.RobocodeFileOutputStream;
 
 public class LUT {
 	private int bestAction = 0;
+	public static int numStates = 1280;
 	private double [][] table;
 	public LUT() {
-		table = new double [States.NumStates][Actions.NumRobotActions];
+		table = new double [numStates][Actions.NumRobotActions];
 		initializeLUT();
 	}
 	
 	public void initializeLUT() {
-		for (int stateN = 0; stateN < States.NumStates; stateN++)   
+		for (int stateN = 0; stateN < numStates; stateN++)   
 		      for (int actionN = 0; actionN < Actions.NumRobotActions; actionN++)   
 		          	  table[stateN][actionN] = 0.0;  
 	}
@@ -55,7 +56,7 @@ public class LUT {
 		BufferedReader read = null;   
 	    try   {   
 	    	read = new BufferedReader(new FileReader(file));   
-	    	for (int i = 0; i < States.NumStates; i++)   
+	    	for (int i = 0; i < numStates; i++)   
 	    		for (int j = 0; j < Actions.NumRobotActions; j++){ 
 	    			//double temp = Double.parseDouble(read.readLine());
 	    			table[i][j] = Double.parseDouble(read.readLine());  
@@ -83,7 +84,7 @@ public class LUT {
 		PrintStream saveFile = null;   
 	    try   {   
 	    	saveFile = new PrintStream(new RobocodeFileOutputStream(file));   
-  			for (int i = 0; i < States.NumStates; i++)   
+  			for (int i = 0; i < numStates; i++)   
   				for (int j = 0; j < Actions.NumRobotActions; j++)   
   					saveFile.println(new Double(table[i][j]));  
   			
@@ -112,7 +113,7 @@ public class LUT {
 		try{
 			printWriter= new PrintStream(new RobocodeFileOutputStream(fileName));		
 			printWriter.println("State"+" \t"+"Action"+" \t"+"QValue");
-			for (int i = 0; i < States.NumStates; i++)   {
+			for (int i = 0; i < numStates; i++)   {
 		        for (int j = 0; j < Actions.NumRobotActions; j++) {
 		        	printWriter.println( i+" \t"+ j+" \t"+ this.table[i][j]);
 		        }
