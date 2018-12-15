@@ -53,25 +53,25 @@ public class RX78_2_GunTank extends AdvancedRobot{
 			action = agent.selectAction(state);
 			while(true) {									
 				switch(action) {
-				case Actions.RobotAhead:
+				case Actions.RobotForward:
 					setAhead(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotBack:
+				case Actions.RobotBackward:
 					setBack(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotAheadTurnLeft:
+				case Actions.RobotForwardTurnLeft:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotAheadTurnRight:
+				case Actions.RobotForwardTurnRight:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnLeft:
+				case Actions.RobotBackwardTurnLeft:
 					setBack(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnRight:
+				case Actions.RobotBackwardTurnRight:
 					setBack(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
@@ -127,25 +127,25 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				action = agent.nn_selectAction();
 				switch(action) 
 			{
-				case Actions.RobotAhead:
+				case Actions.RobotForward:
 					setAhead(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotBack:
+				case Actions.RobotBackward:
 					setBack(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotAheadTurnLeft:
+				case Actions.RobotForwardTurnLeft:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotAheadTurnRight:
+				case Actions.RobotForwardTurnRight:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnLeft:
+				case Actions.RobotBackwardTurnLeft:
 					setBack(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnRight:
+				case Actions.RobotBackwardTurnRight:
 					setBack(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
@@ -180,25 +180,25 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				action = agent.selectAction(state);					
 				switch(action) 
 			{
-				case Actions.RobotAhead:
+				case Actions.RobotForward:
 					setAhead(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotBack:
+				case Actions.RobotBackward:
 					setBack(Actions.RobotMoveDistance);
 					break;
-				case Actions.RobotAheadTurnLeft:
+				case Actions.RobotForwardTurnLeft:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotAheadTurnRight:
+				case Actions.RobotForwardTurnRight:
 					setAhead(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnLeft:
+				case Actions.RobotBackwardTurnLeft:
 					setBack(Actions.RobotMoveDistance);
 					setTurnLeft(Actions.RobotTurnDegree);
 					break;
-				case Actions.RobotBackTurnRight:
+				case Actions.RobotBackwardTurnRight:
 					setBack(Actions.RobotMoveDistance);
 					setTurnRight(Actions.RobotTurnDegree);
 					break;
