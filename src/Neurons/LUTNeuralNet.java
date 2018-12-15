@@ -15,16 +15,16 @@ import java.util.Arrays;
 public class LUTNeuralNet {
 	/***Test Data*****/	
 	private static int numStateCategory = 6;
-	private static int numInput = numStateCategory;
-	private static int numHidden = 40;
+	private static int numInput = numStateCategory+1;
+	private static int numHidden = 30;
 	private static int numOutput = 1;	
 	private static double expectedOutput[][]; //numStates*numActions
-	private static double learningRate = 0.005;
+	private static double learningRate = 0.001;
 	private static double momentumRate = 0.9;
 	private static double lowerBound = -1.0;
 	private static double upperBound = 1.0;
-	private static double [] maxQ = new double[Actions.NumRobotActions];
-	private static double [] minQ = new double[Actions.NumRobotActions];
+	private static double maxQ;
+	private static double minQ;
 	
 	
 	private static ArrayList<Double> errorInEachEpoch;
@@ -35,12 +35,10 @@ public class LUTNeuralNet {
 	
 	public static void main(String[] args){
 		LUT lut = new LUT();
-		//RX78_2_GunTank robot = new RX78_2_GunTank();
-		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		File file = new File("LUT.dat");
 		lut.loadData(file);
-		double inputData[][] = new double [States.NumStates][numStateCategory];
-		double normExpectedOutput[][][] = new double [Actions.NumRobotActions][States.NumStates][numOutput];
+		double inputData[][][] = new double [States.NumStates][Actions.NumRobotActions][numStateCategory+1];//The position of inputdata matches the position of outputdata pointwisely in a 3D space
+		double normExpectedOutput[][][] = new double [States.NumStates][Actions.NumRobotActions][numOutput];
 		expectedOutput = lut.getTable();
 /*		int index = States.getStateIndex(2, 5, 3,1,1, 0);
 		int [] states = States.getStateFromIndex(index);
@@ -53,19 +51,31 @@ public class LUTNeuralNet {
 		double max = findMax(temp);
 		double min = findMin(temp);
 		System.out.println(Double.toString(min)+","+Double.toString(max));*/
+		maxQ = expectedOutput[0][0];
+		minQ = expectedOutput[0][0];
 		for(int act = 0; act<Actions.NumRobotActions;act++) {
-			maxQ[act] = findMax(getColumn(expectedOutput,act));
-			minQ[act] = findMin(getColumn(expectedOutput,act));
-		}
-		for(int stateid = 0; stateid < States.NumStates; stateid++) {
-			int[]state = States.getStateFromIndex(stateid);
-			inputData[stateid] = normalizeInputData(state);
-			for(int act = 0; act < Actions.NumRobotActions; act++) {
-				normExpectedOutput[act][stateid][numOutput-1] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ[act],minQ[act],upperBound,lowerBound);
+			if(findMax(getColumn(expectedOutput,act))> maxQ) 
+			{
+				maxQ = findMax(getColumn(expectedOutput,act));
+			}
+			if(minQ > findMin(getColumn(expectedOutput,act))) 
+			{
+				minQ = findMin(getColumn(expectedOutput,act));
+			}
+		}//Find min and max of the whole LUT
+		maxQ = (int)maxQ+5;
+		minQ = (int)minQ-5;
+		for(int act = 0; act < Actions.NumRobotActions; act++) 	{		
+			for(int stateid = 0; stateid < States.NumStates; stateid++) {
+				int[]state = States.getStateFromIndex(stateid);
+				int[]stateWithAction = Arrays.copyOf(state, state.length+1);//Copy the state data to fill the new array, leave last position blank
+				stateWithAction[stateWithAction.length-1] = act;
+				inputData[stateid][act] = normalizeInputData(stateWithAction);			
+				normExpectedOutput[stateid][act][numOutput-1] =normalizeExpectedOutput(expectedOutput[stateid][act],maxQ,minQ,upperBound,lowerBound);
 			}
 		}
-		neuralNetworks = new ArrayList<NeuralNet>();
-/*		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,6); //Construct a new neural net object
+		
+		/*		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,6); //Construct a new neural net object
 		try {
 			tryConverge(testNeuronNet,inputData,normExpectedOutput[6],10000, 0.13);//Train the network with step and error constrains
 			testNeuronNet.printRunResults(errorInEachEpoch, "bipolarMomentum.csv");
@@ -77,20 +87,11 @@ public class LUTNeuralNet {
 				System.out.println(e);
 			}*/	
 		
-		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.0001,10000,1);
-			System.out.println(act+"The average of number of epoches to converge is: "+average+"\n");
-		}
-		
-		for(NeuralNet net : neuralNetworks) {
-			try {
-					File weight = new File("Weight_"+net.getNetID()+".dat");
-					weight.createNewFile();
-					net.save(weight);
-			}catch(IOException e) {
-				System.out.println(e);
-			}
-		}	
+
+			int average = EpochAverage(inputData,normExpectedOutput,0.00001,10000,1);
+			System.out.println("The average of number of epoches to converge is: "+average+"\n");
+
+
 		
 		
 		System.out.println("Test ends here");
@@ -98,14 +99,14 @@ public class LUTNeuralNet {
 	}
 	
 	public static double [] normalizeInputData(int [] states) {
-		double [] normalizedStates = new double [6];
-		for(int i = 0; i < 6; i++) {
+		double [] normalizedStates = new double [numInput];
+		for(int i = 0; i < numInput; i++) {
 			switch (i) {
 			case 0:
 				normalizedStates[0] = -1.0 + ((double)states[0])*2.0/((double)(States.NumHeading-1));
 				break;
 			case 1:
-				normalizedStates[1] = -1.0 + ((double)states[1])*2.0/((double)(States.NumTargetDistance-1));;
+				normalizedStates[1] = -1.0 + ((double)states[1])*2.0/((double)(States.NumTargetDistance-1));
 				break;
 			case 2:
 				normalizedStates[2] = -1.0 + ((double)states[2])*2.0/((double)(States.NumTargetBearing-1));;
@@ -118,6 +119,9 @@ public class LUTNeuralNet {
 				break;
 			case 5:
 				normalizedStates[5] = -1.0 + ((double)states[5])*2.0;
+				break;
+			case 6:
+				normalizedStates[6] = -1.0 + ((double)states[6])*2.0/((double)(Actions.NumRobotActions-1));
 				break;
 			default:
 				System.out.println("The data doesn't belong here.");
@@ -164,7 +168,7 @@ public class LUTNeuralNet {
 	 * @param numTrials
 	 * @return the average of number of epochs
 	 */
-	public static int EpochAverage(int act,double[][] input, double[][] expected,double minError, int maxSteps, int numTrials) {
+	public static int EpochAverage(double[][][] input, double[][][] expected,double minError, int maxSteps, int numTrials) {
 		int epochNumber, failure,success;
 		double average = 0f;
 		epochNumber = 0;
@@ -172,7 +176,7 @@ public class LUTNeuralNet {
 		success = 0;
 		NeuralNet testNeuronNet = null;
 		for(int i = 0; i < numTrials; i++) {
-			testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act); //Construct a new neural net object
+			testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,0); //Construct a new neural net object
 			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
 			epochNumber = getErrorArray().size(); //get the epoch number of this trial.
 			if( epochNumber < maxSteps) {
@@ -186,7 +190,13 @@ public class LUTNeuralNet {
 		double convergeRate = 100*success/(success+failure);
 		System.out.println("The net converges for "+convergeRate+" percent of the time.\n" );
 		average = average/success;
-		neuralNetworks.add(testNeuronNet);		
+		try {
+			File weight = new File("Weight.dat");
+			weight.createNewFile();
+			testNeuronNet.save(weight);
+		}catch(IOException e) {
+			System.out.println(e);
+		}
 		return (int)average;		
 	}	
 	/**
@@ -194,7 +204,7 @@ public class LUTNeuralNet {
 	 * @param maxStep
 	 * @param minError
 	 */
-	public static void tryConverge(NeuralNet theNet, double[][] input, double [][] expected,int maxStep, double minError) {
+	public static void tryConverge(NeuralNet theNet, double[][][] input, double [][][] expected,int maxStep, double minError) {
 		int i;
 		double totalerror = 1;
 		double previouserror = 1;
@@ -204,7 +214,10 @@ public class LUTNeuralNet {
 			previouserror = totalerror;
 			totalerror = 0.0;
 			for(int j = 0; j < input.length; j++) {
-				totalerror += theNet.train(input[j],expected[j]);				
+				for(int k = 0; k < input[0].length;k++) {
+					totalerror += theNet.train(input[j][k],expected[j][k]);	
+				}
+							
 			}
 			//totalerror = totalerror*0.5;
 			totalerror = Math.sqrt(totalerror/input.length);

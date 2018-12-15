@@ -1,9 +1,9 @@
 package learning;
 
 public class States {
-	public static final int NumHeading = 16;  //Four states, up, right, down, left
-	public static final int NumTargetDistance = 50;  //Ten levels of distance
-	public static final int NumTargetBearing = 16;  
+	public static final int NumHeading = 4;  //Four states, up, right, down, left
+	public static final int NumTargetDistance = 10;  //Ten levels of distance
+	public static final int NumTargetBearing = 4;  
 	//public static final int NumHitWall = 2;  
 	public static final int NumHorizontalPositionUnsafe = 2; 
 	public static final int NumVerticalPositionUnsafe = 2; 
