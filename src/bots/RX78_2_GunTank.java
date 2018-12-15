@@ -32,10 +32,11 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	private boolean interRewards = true;
 	private boolean isSARSA = false; //Switch between on policy and off policy, true = on-policy, false = off-policy
 	private boolean isOnline = true;
+	private boolean isNaive = true;
 	//private PrintStream w = null;
 	public void run() {
 		lut = new LUT();
-		//loadData();
+		loadData();
 		agent = new LearningKernel(lut);
 		target = new Target();
 		target.setDistance(100000);
@@ -99,11 +100,24 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		}
 		else if(isOnline){
 			agent.initializeNeuralNetworks();
-			for(NeuralNet theNet: agent.getNeuralNetworks()) {
-				try {
-					theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
-				} catch (IOException e) {
-					e.printStackTrace();
+			if(isNaive) {
+				if(getRoundNum()>0) {
+					for(NeuralNet theNet: agent.getNeuralNetworks()) {
+						try {
+							theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			else {
+				for(NeuralNet theNet: agent.getNeuralNetworks()) {
+					try {
+						theNet.load(getDataFile("Weight_"+theNet.getNetID()+".dat"));
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -354,15 +368,14 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	public void onWin(WinEvent event)   
     {   
 		reward+=rewardForWin;
-		//moveRobot();
-		saveData();   
+		if(!isOnline) saveData();   
   		int winningTag=1;
-  		
-  		for(NeuralNet net : agent.getNeuralNetworks())
-  		{
-  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+  		if(isOnline) {
+	  		for(NeuralNet net : agent.getNeuralNetworks())
+	  		{
+	  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+	  		}
   		}
-
   		PrintStream w = null; 
   		try { 
   			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 
@@ -392,13 +405,14 @@ public class RX78_2_GunTank extends AdvancedRobot{
     public void onDeath(DeathEvent event)   
     {   
     	reward+=rewardForDeath;
-    	//moveRobot();
-		saveData();  
+    	if(!isOnline) saveData();  
        
 		int losingTag=0;
-		for(NeuralNet net : agent.getNeuralNetworks())
-  		{
-  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+  		if(isOnline) {
+	  		for(NeuralNet net : agent.getNeuralNetworks())
+	  		{
+	  			net.save_robot(getDataFile("Weight_"+net.getNetID()+".dat"));
+	  		}
   		}
 		PrintStream w = null; 
 		try { 
@@ -424,20 +438,20 @@ public class RX78_2_GunTank extends AdvancedRobot{
     }	
     //======= Load and Save the Look Up Table =========	
 	public void loadData()   {   
-	      try   {   
-	        lut.loadData(getDataFile("LUT.dat"));   
-	      }   
-	      catch (Exception e)   {
-	      	out.println("Exception trying to write: " + e); 
-	      }   
+	    try   {   
+	      lut.loadData(getDataFile("LUT.dat"));   
 	    }   
+	    catch (Exception e)   {
+	    	out.println("Exception trying to write: " + e); 
+	    }   
+	}   
 	     
 	public void saveData()   {   
-	      try   {   
-	        lut.saveData(getDataFile("LUT.dat"));
-	      }   
-	      catch (Exception e)   {   
-	        out.println("Exception trying to write: " + e);   
-	      }   
+	    try   {   
+	      lut.saveData(getDataFile("LUT.dat"));
 	    }   
+	    catch (Exception e)   {   
+	      out.println("Exception trying to write: " + e);   
+	    }   
+	 }   
 }
