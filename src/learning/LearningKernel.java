@@ -34,6 +34,8 @@ public class LearningKernel {
 	private double newActionOutput[] = new double [numNerualNet];
 	private double newQValue[] =  new double [numNerualNet];
 	
+	private double errorSignal;
+	
 	private ArrayList<NeuralNet> neuralNetworks = new ArrayList<NeuralNet>();
 	
 	public LearningKernel (LUT table) {
@@ -42,7 +44,9 @@ public class LearningKernel {
 			maxQ[act] = 5+LUTNeuralNet.findMax(getColumn(lut.getTable(),act));
 			minQ[act] = -5+LUTNeuralNet.findMin(getColumn(lut.getTable(),act));
 		} 
-		System.out.println("break here.");
+		
+		setErrorSignal(0.0);
+		//System.out.println("break here.");
 	}
 	
 	//Off-policy learning
@@ -139,6 +143,9 @@ public class LearningKernel {
 		NeuralNet learningNet = neuralNetworks.get(action);
 		double [] currentInputData = LUTNeuralNet.normalizeInputData(getCurrentStateArray());
 		learningNet.train(currentInputData, expectedOutput);
+		double tempOutput2 = learningNet.outputFor(currentInputData)[0];
+		double tempQValue2 = LUTNeuralNet.inverseMappingOutput(tempOutput2, maxQ[action], minQ[action], upperBound, lowerBound);
+		setErrorSignal(Math.abs(expectedQValue - tempQValue2));
 	}
 	
 	public void initializeNeuralNetworks(){
@@ -204,6 +211,14 @@ public class LearningKernel {
 	
 	public ArrayList<NeuralNet> getNeuralNetworks(){
 		return this.neuralNetworks;
+	}
+	
+	public void setErrorSignal(double error){
+		errorSignal = error;
+	}
+	
+	public double getErrorSignal(){
+		return errorSignal;
 	}
 	
 	public int getMaxIndex(double [] theValues) {
