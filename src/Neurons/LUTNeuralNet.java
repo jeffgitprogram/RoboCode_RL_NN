@@ -175,6 +175,12 @@ public class LUTNeuralNet {
 			testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate,lowerBound,upperBound,act); //Construct a new neural net object
 			tryConverge(testNeuronNet,input,expected,maxSteps, minError);//Train the network with step and error constrains
 			epochNumber = getErrorArray().size(); //get the epoch number of this trial.
+			try {
+				testNeuronNet.printRunResults(errorInEachEpoch, "bipolarMomentum"+testNeuronNet.getNetID()+".csv");
+			}
+			catch(IOException e){
+				System.out.println(e);
+			}
 			if( epochNumber < maxSteps) {
 				average = average +  epochNumber;
 				success ++; 
