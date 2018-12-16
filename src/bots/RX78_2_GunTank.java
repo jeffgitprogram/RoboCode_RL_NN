@@ -452,5 +452,28 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	    catch (Exception e)   {   
 	      out.println("Exception trying to write: " + e);   
 	    }   
-	 }   
+	 }
+	
+	public void printQValueError(){
+  		PrintStream save = null; 
+  		try { 
+  			save = new PrintStream(new RobocodeFileOutputStream(getDataFile("QValueVariation.dat").getAbsolutePath(), true)); //Print at the end of file
+  			save.println(agent.getErrorSignal());
+  			if (save.checkError()) 
+  				System.out.println("Save error signal failed!"); 
+  				save.close(); 
+  		} 
+	    catch (IOException e) { 
+	    	System.out.println("Error when trying to write: " + e); 
+	    } 
+	    finally { 
+	    	try { 
+	    		if (save != null) 
+	    			save.close(); 
+	    	} 
+	    	catch (Exception e) { 
+	    		System.out.println("Finally error when trying to close writer: " + e); 
+	    	}
+	    } 
+	}
 }
