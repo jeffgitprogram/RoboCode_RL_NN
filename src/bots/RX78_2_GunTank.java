@@ -40,6 +40,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		agent = new LearningKernel(lut);
 		target = new Target();
 		target.setDistance(100000);
+		int[]oldStates = new int[6];
 		
 		setAllColors(Color.red);
 		setAdjustGunForRobotTurn(true);
@@ -162,9 +163,15 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				execute();					
 				turnRadarRightRadians(2*PI);
 				//Update states
+				oldStates = States.getStateFromIndex(state);
 				state = getState();
 				agent.setNewStateArray(state);
-				agent.nn_QLearn(action, reward);
+				agent.nn_QLearn(action, reward);				
+				if((getRoundNum()>=200)&&(getRoundNum()<=1000)){		
+					if((oldStates[3]==0)&&(oldStates[4]==0)&&(oldStates[5]==1)&&(oldStates[2]>=3)&&(oldStates[2]<=5)&&(action==6)){
+						printQValueError();
+					}
+				}
 				accumuReward += reward;					
 				//Reset Values
 				reward = 0.0d;
