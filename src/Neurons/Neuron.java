@@ -107,10 +107,6 @@ public class Neuron {
 			double input = connection.getInput();
 			weightedSum = weightedSum + weight*input;
 		}		
-		/*
-		if (biasConnection != null) {
-			weightedSum = weightedSum + (this.biasConnection.getWeight()*this.bias);
-		}*/
 		
 		return weightedSum;
 	}
@@ -133,7 +129,6 @@ public class Neuron {
 	 */	  
 	private void addBiasConnection(Neuron neuron) {
 		NeuronConnection connection = new NeuronConnection(neuron,this);
-		//this.biasConnection = connection;
 		inputConnections.add(connection); //Add bias connection to the list for the ease of weight updating, it should always output 0
 	}
 	

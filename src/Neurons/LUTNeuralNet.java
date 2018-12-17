@@ -35,8 +35,6 @@ public class LUTNeuralNet {
 	
 	public static void main(String[] args){
 		LUT lut = new LUT();
-		//RX78_2_GunTank robot = new RX78_2_GunTank();
-		//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\LUT.dat");
 		File file = new File("LUT.dat");
 		lut.loadData(file);
 		double inputData[][] = new double [LUT.numStates][numStateCategory];
@@ -54,8 +52,8 @@ public class LUTNeuralNet {
 		double min = findMin(temp);
 		System.out.println(Double.toString(min)+","+Double.toString(max));*/
 		for(int act = 0; act<Actions.NumRobotActions;act++) {
-			maxQ[act] = findMax(getColumn(expectedOutput,act));
-			minQ[act] = findMin(getColumn(expectedOutput,act));
+			maxQ[act] = 5 + findMax(getColumn(expectedOutput,act));
+			minQ[act] = -5 + findMin(getColumn(expectedOutput,act));
 		}
 		for(int stateid = 0; stateid < LUT.numStates; stateid++) {
 			int[]state = States.getStateFromIndex(stateid);
@@ -78,7 +76,7 @@ public class LUTNeuralNet {
 			}*/	
 		
 		for(int act = 0; act < Actions.NumRobotActions; act++) {
-			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.000005,10000,1);
+			int average = EpochAverage(act,inputData,normExpectedOutput[act],0.000005,10000,10);
 			System.out.println(act+"The average of number of epoches to converge is: "+average+"\n");
 		}
 		
@@ -212,7 +210,6 @@ public class LUTNeuralNet {
 			for(int j = 0; j < input.length; j++) {
 				totalerror += theNet.train(input[j],expected[j]);				
 			}
-			//totalerror = totalerror*0.5;
 			totalerror = Math.sqrt(totalerror/input.length);
 			errorInEachEpoch.add(totalerror);
 			variation  = Math.abs(totalerror - previouserror);

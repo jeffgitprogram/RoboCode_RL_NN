@@ -7,7 +7,6 @@ import robocode.*;
 
 import learning.*;
 import Neurons.*;
-//API help : http://robocode.sourceforge.net/docs/robocode/robocode/Robot.html
 
 
 public class RX78_2_GunTank extends AdvancedRobot{
@@ -33,7 +32,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	private boolean isSARSA = false; //Switch between on policy and off policy, true = on-policy, false = off-policy
 	private boolean isOnline = true;
 	private boolean isNaive = true;
-	//private PrintStream w = null;
+
 	public void run() {
 		lut = new LUT();
 		loadData();
@@ -48,7 +47,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		execute();		
 		
 		if(isSARSA) {		
-			//Get Last State
+	
 			state = getState();
 			turnRadarRightRadians(2*PI);
 			action = agent.selectAction(state);
@@ -87,13 +86,12 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				}					
 				execute();					
 				turnRadarRightRadians(2*PI);
-				//Update states
+
 				state = getState();
 				action = agent.selectAction(state);
 				agent.SARSLearn(state, action, reward);
 				accumuReward += reward;
 				
-				//Reset Values
 				reward = 0.0d;
 				isHitWall = 0;
 				isHitByBullet = 0;
@@ -162,27 +160,28 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				}					
 				execute();					
 				turnRadarRightRadians(2*PI);
-				//Update states
+
 				oldStates = States.getStateFromIndex(state);
 				state = getState();
 				agent.setNewStateArray(state);
-				agent.nn_QLearn(action, reward);				
-				if((getRoundNum()>=200)&&(getRoundNum()<=1000)){		
-					if((oldStates[3]==0)&&(oldStates[4]==0)&&(oldStates[5]==1)&&(oldStates[2]>=3)&&(oldStates[2]<=5)&&(action==6)){
+				agent.nn_QLearn(action, reward);	
+				//Collect Error Signal Data
+				if((getRoundNum()>=200)&&(getRoundNum()<=1500)){		
+					if((oldStates[3]==0)&&(oldStates[4]==0)&&(oldStates[5]==1)&&(oldStates[1]>=15)&&(oldStates[1]<=35)&&(action==6)){
 						printQValueError();
 					}
 				}
+				
 				accumuReward += reward;					
-				//Reset Values
 				reward = 0.0d;
 				isHitWall = 0;
 				isHitByBullet = 0;
 			}
 		}
 		else {
-			state = getState();//Get Last State
+			state = getState();
 			while(true) {
-				//state = getState();//Get Last State
+
 				turnRadarRightRadians(2*PI);					
 				action = agent.selectAction(state);					
 				switch(action) 
@@ -221,11 +220,11 @@ public class RX78_2_GunTank extends AdvancedRobot{
 				}					
 				execute();					
 				turnRadarRightRadians(2*PI);
-				//Update states
+
 				state = getState();
 				agent.QLearn(state, action, reward);
 				accumuReward += reward;					
-				//Reset Values
+
 				reward = 0.0d;
 				isHitWall = 0;
 				isHitByBullet = 0;
@@ -233,7 +232,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		}		
 	}
 	
-	////=====Supportive Functions-------////////
+	////=====Utility-------////////
 	private void scanAndFire() {
 		isFound = false;
 		while(!isFound) {
@@ -255,11 +254,11 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		int targetBearing = States.getTargetBearing(target.getBearing());
 		int horizontalUnsafe = States.getHorizontalPositionUnsafe(getX(),getBattleFieldWidth());
 		int verticalUnsafe = States.getVerticalPositionUnsafe(getY(), getBattleFieldHeight());
-		//int state = States.getStateIndex(heading, targetDistance, targetBearing, isHitWall, isHitByBullet);
 		int state = States.getStateIndex(heading, targetDistance, targetBearing, horizontalUnsafe,verticalUnsafe, isHitByBullet);
 		return state;
 		
 	}
+	
 	// This function transform the range of bearing from 0-2pi to -pi-pi
 	private double NormalizeBearing(double bearing) {
 		while(bearing > PI) {
@@ -272,27 +271,23 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	}
 	
 	//=======Robot Events=======////
-	/**
-	 * onScannedRobot: What to do when you see another robot
-	 */
+
 	public void onScannedRobot(ScannedRobotEvent e) {
 		isFound = true;
 		targetDist = e.getDistance();
 		targetBearing = e.getBearing();
 		if ((e.getDistance() < target.getDistance())||(target.getName() == e.getName()))   
         {   
-          //the next line gets the target's heading in radians  relative to your position
           double absbearing_rad = (getHeadingRadians()+e.getBearingRadians())%(2*PI);   
-          //this section sets all the information about our target   
           target.setName(e.getName());   
-          double h = NormalizeBearing(e.getHeadingRadians() - target.getHead());// Determine which direction to turn   
+          double h = NormalizeBearing(e.getHeadingRadians() - target.getHead()); 
           h = h/(getTime() - target.getCtime());   
           target.setChangeHead(h);   
-          target.setPositionX(getX()+Math.sin(absbearing_rad)*e.getDistance()); //Determine the x coordinate of where the target is   
-          target.setPositionY(getY()+Math.cos(absbearing_rad)*e.getDistance()); //Determine the y coordinate of where the target is   
+          target.setPositionX(getX()+Math.sin(absbearing_rad)*e.getDistance());   
+          target.setPositionY(getY()+Math.cos(absbearing_rad)*e.getDistance());   
           target.setBearing(e.getBearingRadians());   
           target.setHead(e.getHeadingRadians());  
-          target.setCtime(getTime());             //Record the time at which this scan was produced   
+          target.setCtime(getTime());             
           target.setSpeed(e.getVelocity());  
           target.setDistance(e.getDistance());   
           target.setEnergy(e.getEnergy());   
@@ -300,9 +295,6 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	}
 
 	
-	/**
-	 * onBulletHit: What to do when hit other robots
-	 */
 	public void onBulletHit(BulletHitEvent e)   
     {  
 		if (target.getName() == e.getName()) {     
@@ -313,31 +305,25 @@ public class RX78_2_GunTank extends AdvancedRobot{
     }  
 	
 	
-	/**
-	 * onBulletMissed: What to do when miss other robots
-	 */
+
 	public void onBulletMissed(BulletMissedEvent e)   
     {   
 		double change = -e.getBullet().getPower() * 7.5;   
 		System.out.println("Bullet Missed: " + change);   
 		if (interRewards) reward += change;   
     }
-	/**
-	 * onHitByBullet: What to do when you're hit by a bullet
-	 */
+
 	public void onHitByBullet(HitByBulletEvent e) {
 		if (target.getName()== e.getName())   {   
 			double power = e.getBullet().getPower();   
 			double change = -6 * power;
 			System.out.println("Hit By Bullet: " + change);   
-			if (interRewards) reward += change;  //Generate intermediate reward value 
+			if (interRewards) reward += change;  
 		}
 		isHitByBullet = 1;  
 	}
 	
-	/**
-	 * onHitByBullet: What to do when you're hit by a robot
-	 */
+
 	public void onHitRobot(HitRobotEvent e) {   
 		if (target.getName() == e.getName()) {   
 			double change = -6.0;   
@@ -346,11 +332,8 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		}   
     }  
 	
-	/**
-	 * onHitWall: What to do when you hit a wall
-	 */
+
 	public void onHitWall(HitWallEvent e) {
-		//double change = -(Math.abs(getVelocity()) * 0.5 - 1) * 10;   
 		double change = -10.0;   
 		System.out.println("Hit Wall: " + change);   
 		if (interRewards) reward += change;   
@@ -358,9 +341,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
       
 	}	
 	
-	/**
-	 * onRobotDeath: What to do when other robot dead
-	 */
+
 	public void onRobotDeath(RobotDeathEvent e) {   
 		if (e.getName() == target.getName()) {
 			target.setDistance(10000); 
@@ -368,9 +349,7 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		if (interRewards) reward += 20;
     }   
 	
-	/**
-	 *  onWin: Robot win the game
-	 */
+
 	public void onWin(WinEvent event)   
     {   
 		reward+=rewardForWin;
@@ -385,10 +364,9 @@ public class RX78_2_GunTank extends AdvancedRobot{
   		PrintStream w = null; 
   		try { 
   			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 
-  			//w.println(accumuReward+" \t"+getRoundNum()+" \t"+winningTag+" \t"+LearningKernel.explorationRate); 
   			w.println(getRoundNum()+" \t"+winningTag);
   			if (w.checkError()) 
-  				System.out.println("Could not save the data!");  //setTurnLeft(180 - (target.bearing + 90 - 30));
+  				System.out.println("Could not save the data!");  
   				w.close(); 
   		} 
 	    catch (IOException e) { 
@@ -400,14 +378,12 @@ public class RX78_2_GunTank extends AdvancedRobot{
 	    			w.close(); 
 	    	} 
 	    	catch (Exception e) { 
-	    		System.out.println("Exception trying to close witer: " + e); 
+	    		System.out.println("Exception trying to close writer: " + e); 
 	    	}
 	    } 
     }   
      
-	/**
-	 *  onDeath: Robot lose the game
-	 */
+
     public void onDeath(DeathEvent event)   
     {   
     	reward+=rewardForDeath;
@@ -423,7 +399,6 @@ public class RX78_2_GunTank extends AdvancedRobot{
 		PrintStream w = null; 
 		try { 
 			w = new PrintStream(new RobocodeFileOutputStream(getDataFile("battle_history.dat").getAbsolutePath(), true)); 
-			//w.println(accumuReward+" \t"+getRoundNum()+" \t"+losingTag+" \t"+LearningKernel.explorationRate); 
 			w.println(getRoundNum()+" \t"+losingTag);
 			if (w.checkError()) 
 				System.out.println("Could not save the data!"); 
@@ -438,11 +413,12 @@ public class RX78_2_GunTank extends AdvancedRobot{
 					w.close(); 
 			} 
 			catch (Exception e) { 
-				System.out.println("Exception trying to close witer: " + e); 
+				System.out.println("Exception trying to close writer: " + e); 
 			} 
 		} 
     }	
-    //======= Load and Save the Look Up Table =========	
+    
+
 	public void loadData()   {   
 	    try   {   
 	      lut.loadData(getDataFile("LUT.dat"));   

@@ -1,9 +1,6 @@
 package Neurons;
 
 public class NeuronConnection {
-	//Conection's Identifier
-	//private final int id;
-	
 	/*Specify the source of this connection*/
 	private Neuron SrcNeuron;
 	/*Specify the destination of this connection*/

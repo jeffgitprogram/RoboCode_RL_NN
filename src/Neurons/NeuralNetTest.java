@@ -191,7 +191,6 @@ public class NeuralNetTest {
 	public void testLoadingWeight(){
 		NeuralNet testNeuronNet = new NeuralNet(numInput,numHidden,numOutput,learningRate,momentumRate_2,b_lowerBound,b_upperBound,1);
 		try {
-			//File file = new File("E:\\Work\\java\\RoboCode_RL_NN\\weight.txt");	
 			File file = new File("Weight_1.txt");
 			testNeuronNet.load(file);			
 		}

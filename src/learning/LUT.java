@@ -58,7 +58,6 @@ public class LUT {
 	    	read = new BufferedReader(new FileReader(file));   
 	    	for (int i = 0; i < numStates; i++)   
 	    		for (int j = 0; j < Actions.NumRobotActions; j++){ 
-	    			//double temp = Double.parseDouble(read.readLine());
 	    			table[i][j] = Double.parseDouble(read.readLine());  
 	    		}
 	    }   
@@ -137,11 +136,5 @@ public class LUT {
 	    }
 		
 	}
-
-
-
-
-	
-
 	
 }

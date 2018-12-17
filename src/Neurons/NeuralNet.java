@@ -28,11 +28,7 @@ public class NeuralNet implements NeuralNetInterface {
 	/* Need to keep in mind that, all neurons can connect to the same bias neuron, since the output of bias neuron is not evaluated*/
 	private Neuron biasNeuron = new Neuron("bias"); // Neuron id 0 is reserved for bias neuron
 	/**These arrays and list save the input data, expected output, actual output and error in each epoch****/
-	//private double inputData[][];	
-	//private double expectedOutput[][];
-	//private double epochOutput[][];//Initial value -1 for each output
-	//private ArrayList<Double> errorInEachEpoch = new ArrayList<>();
-	
+
 	
 	public NeuralNet(
 					int numInputs, int numHiddens, 
@@ -47,8 +43,6 @@ public class NeuralNet implements NeuralNetInterface {
 		this.argMomentumRate = momentumRate;
 		this.argQMin = a;
 		this.argQMax = b;
-		//this.inputData = inputData;
-		//this.expectedOutput = expectedOutput;
 		this.setUpNetwork();
 		this.initializeWeights();
 		this.netID = id;
@@ -131,22 +125,7 @@ public class NeuralNet implements NeuralNetInterface {
 		return this.outputLayerNeurons;
 	}
 	
-	/**
-	 * 
-	 * @return an array of results for each forwarding in a single epoch
-	 */
-	/*public double [][] getEpochResults() {
-		return epochOutput;
-	}
-	
-	public void setEpochResults(double[][] results){
-		for(int i = 0; i < results.length;i++) {
-			for(int j = 0; j < results[i].length;j++)
-			{
-				epochOutput[i][j] = results[i][j];
-			}
-		}
-	}*/
+
 	
 	/**
 	 * This perform backpropagation to update all the weight in this NN.

@@ -46,10 +46,10 @@ public class LearningKernel {
 		} 
 		
 		setErrorSignal(0.0);
-		//System.out.println("break here.");
+
 	}
 	
-	//Off-policy learning
+
 	public void QLearn (int nextState, int nextAction, double reward) {
 		double lastQVal;
 		double newQVal;
@@ -66,7 +66,7 @@ public class LearningKernel {
 		currentAction = nextAction;
 	}
 	
-	//On-policy Learning
+
 	public void SARSLearn(int nextState, int nextAction, double reward) {
 		double lastQVal;
 		double newQVal;
@@ -83,19 +83,20 @@ public class LearningKernel {
 		currentAction = nextAction;
 	}
 	
-	//Episilon-Greedy
+
 	public int selectAction(int state) {
 		double epsl = Math.random();
 		int action = 0;
 		if(epsl < explorationRate) {
 			Random rand = new Random();
-			action = rand.nextInt(Actions.NumRobotActions);//Exploration Move
+			action = rand.nextInt(Actions.NumRobotActions);
 		}else {
-			//Greedy Move
+
 			action = lut.getMaxQAction(state);
 		}
 		return action;
 	}
+	
 	//Always select action based on current state, current state is the state before an action is executed in each iteration
 	public int nn_selectAction() {
 		double epsl = Math.random();
@@ -115,9 +116,7 @@ public class LearningKernel {
 				setCurrentQValue(currentNetQValue,currentNetIndex);
 			}
 			
-			action = getMaxIndex(getCurrentQValues());
-			//double maxNNOutput = getNewActionValues()[bestAction];	
-			
+			action = getMaxIndex(getCurrentQValues());			
 		}
 		return action;
 	}
@@ -145,7 +144,7 @@ public class LearningKernel {
 		learningNet.train(currentInputData, expectedOutput);
 		double tempOutput2 = learningNet.outputFor(currentInputData)[0];
 		double tempQValue2 = LUTNeuralNet.inverseMappingOutput(tempOutput2, maxQ[action], minQ[action], upperBound, lowerBound);
-		setErrorSignal(Math.abs(expectedQValue - tempQValue2));
+		setErrorSignal(Math.abs(currentStateQValue - tempQValue2));
 	}
 	
 	public void initializeNeuralNetworks(){
